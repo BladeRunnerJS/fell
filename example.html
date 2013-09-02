@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<meta charset="utf-8">
+</head>
+<body>
+<script src="node_modules/Emitter/lib/Emitter.js"></script>
+<script src="lib/LogUtils.js"></script>
+<script src="lib/destination/ConsoleLog.js"></script>
+<script src="lib/destination/LogStore.js"></script>
+<script src="lib/Log.js"></script>
+
+<script>
+	var store = new fell.destination.LogStore();
+	var Log = fell.Log;
+
+	Log.addDestination(store);
+	Log.info("hello");
+
+	var cl = Log.getLogger("caplin.logging");
+	cl.debug("debug message");
+	cl.info("info message {0}, {1}", "it's true", "really");
+
+	console.log(store.allMessages().join("\n"));
+</script>
+
+</body>
+</html>
