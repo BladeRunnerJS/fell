@@ -1,27 +1,25 @@
 {
-	"name": "fell",
-	"version": "0.0.1",
-	"description": "A javascript logging framework.",
-	"license": "MIT",
-	"dependencies" : {
-		"Emitter": "git+https://github.com/kybernetikos/Emitter.git#gh-pages"
-	},
-	"devDependencies" : {
-		"jsdoc3": "git://github.com/jsdoc3/jsdoc.git",
-		"jshamcrest": "0.7.x",
-		"jasmine-node": "1.11.x",
-		"grunt": "~0.4.1",
-		"grunt-contrib-jshint": "~0.6.3",
-		"grunt-contrib-nodeunit": "~0.2.0",
-		"grunt-contrib-uglify": "~0.2.2"
-	},
-	"repository": {
-		"type" : "git",
-		"url" : "https://github.com/caplin/fell.git"
-	},
-	"main": "./lib/fell.js",
-	"scripts": {
-		"test": "jasmine-node --verbose spec",
-		"doc": "jsdoc fell.js -d doc README.md"
-	}
+  "name": "fell",
+  "version": "0.0.1",
+  "description": "A javascript logging framework.",
+  "license": "MIT",
+  "dependencies": {
+    "Emitter": "git+https://github.com/kybernetikos/Emitter.git#gh-pages"
+  },
+  "devDependencies": {
+    "jsdoc3": "git://github.com/jsdoc3/jsdoc.git",
+    "jshamcrest": "0.7.x",
+    "jasmine-node": "1.11.x",
+    "fs-extra": "~0.6.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/caplin/fell.git"
+  },
+  "main": "./lib/fell.js",
+  "scripts": {
+    "test": "jasmine-node --verbose spec",
+    "doc": "jsdoc lib -d doc",
+    "prepublish": "node build/package.js"
+  }
 }

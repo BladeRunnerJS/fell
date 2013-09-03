@@ -1,3 +1,6 @@
+// This is an implementation of require/define that works in a browser assuming all required modules
+// have been defined within the browser *before* any requires are done.
+
 var global = (function() {return this;})();
 var topLevelRequire = global['require'] || function(moduleName) {
 	return global[moduleName];
@@ -46,7 +49,7 @@ function realm() {
 		});
 		incompleteExports[id] = module;
 		var definitionContext = id.substring(0, id.lastIndexOf("/"));
-		var returnValue = definition.call(module, require.bind(null, definitionContext), module, module.exports);
+		var returnValue = definition.call(module, require.bind(null, definitionContext), module.exports, module);
 		moduleExports[id] = returnValue || module.exports;
 		delete incompleteExports[id];
 		return moduleExports[id];

@@ -1,3 +1,5 @@
+// Visits every file in a directory tree, emitting events for them.
+
 var fs = require('fs');
 var events = require('events');
 

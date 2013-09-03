@@ -1,1 +1,2 @@
-js: lib/fell.js
+depends: browser-modules
+js: target/define-single/fell.js
