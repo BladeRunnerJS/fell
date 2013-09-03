@@ -11,16 +11,16 @@ describe('A Log object', function(){
 
 	beforeEach(function() {
 		store = new LogStore();
-		Log.clear();
-		Log.addDestination(store);
+		Log.configure("info", {}, [store]);
 	});
 
-	describe('when newly created,', function() {
-		it('starts with its level set to info.', function() {
+	describe('when newly created, and configured with level info', function() {
+		it('does not output debug level messages.', function() {
 
 			Log.Levels.forEach(function(level) {
 				Log[level]("logging message at level {0}", level);
 			});
+
 
 			assertThat(store, LogStore.containsAll(
 					LogStore.event('fatal', Log.DEFAULT_COMPONENT, ["logging message at level {0}", 'fatal']),
@@ -32,11 +32,8 @@ describe('A Log object', function(){
 			assertThat(store, not(LogStore.contains(LogStore.event('debug'))));
 		});
 
-		it('and the level is set to error, then only error and fatal messages are logged', function() {
-
-			Log.configure({
-				"[default]": "error"
-			});
+		it('and the level is changed to error, then only error and fatal messages are logged', function() {
+			Log.changeLevel('error');
 
 			Log.Levels.forEach(function(level) {
 				Log[level]("logging message at level {0}", level);
