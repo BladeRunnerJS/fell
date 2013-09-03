@@ -2,6 +2,7 @@
   "name": "fell",
   "version": "0.0.1",
   "description": "A javascript logging framework.",
+  "homepage": "http://caplin.github.io/fell",
   "license": "MIT",
   "dependencies": {
     "Emitter": "git+https://github.com/kybernetikos/Emitter.git#gh-pages"
