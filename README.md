@@ -33,6 +33,8 @@ Aims
 Usage
 -----
 
+###  Getting the Log object.
+
 Start by getting the Log object.
 
 ```javascript
@@ -47,11 +49,49 @@ Start by getting the Log object.
     var Log = typeof fell !== 'undefined' ? fell.Log : require('fell').Log;
 ```
 
+### The Default Logger
+
 The default configuration has it outputting to the console (if one is available), so you can start
 using it immediately:
 
 ```javascript
 
-   Log.info("Log messages by default have {0} replaced {1}.", "numbers surrounded by curly braces", "by their arguments");
+   Log.info("Log messages by default have {0} replaced {1}.",
+               "numbers surrounded by curly braces",
+               "by their arguments");
    Log.warn("The levels supported are fatal, error, warn, info and debug");
 ```
+
+### Specific Loggers
+
+You can get more fined grained control if you log to specified loggers within your classes.
+
+```javascript
+
+   function MyClass() {
+       this.log = Log.getLogger('mymodule.MyClass');
+   }
+
+   MyClass.prototype.doAThing = function() {
+       this.log.warn("The thing that MyClass does is potentially dangerous!");
+   };
+
+   var myObj = new MyClass();
+   myObj.doAThing();
+```
+
+### Configuration
+
+To take advantage of this control, you can configure particular loggers to log at particular levels.
+
+```javascript
+
+    Log.configure('error', {
+        'mymodule': 'info',
+        'mymodule.some.hierarchy': 'fatal'
+    });
+```
+
+This tells the logging system to use 'error' as the log level for anything that is not a part of
+'mymodule'.  In the earlier example, 'mymodule.MyClass' would have been logged at 'info' level,
+any logger for 'mymodule.some.hierarchy' or lower would only log fatal log messages.
