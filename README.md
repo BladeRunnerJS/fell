@@ -4,6 +4,9 @@ permalink: /index.html
 title: fell logging
 ---
 
+<script type="text/javascript" src="node_modules/Emitter/lib/Emitter.js"></script>
+<script type="text/javascript" src="http://caplin.github.io/Emitter/lib/Emitter.js"></script>
+
 <script type="text/javascript" src="target/single/fell.js"></script>
 
 fell

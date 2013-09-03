@@ -10,13 +10,19 @@
 	<script type="text/javascript" src="jasmine-1.1.0/jasmine.js"></script>
 	<script type="text/javascript" src="jasmine-1.1.0/jasmine-html.js"></script>
 
+	<!-- both local and remote versions of jshamcrest so it will work even if we are offline -->
+	<script type="text/javascript" src="http://danielfm.github.io/jshamcrest/jshamcrest.js"></script>
 	<script type="text/javascript" src="../node_modules/jshamcrest/jshamcrest.js"></script>
 	<script type="text/javascript">
 		JsHamcrest.Integration.jasmine();
 	</script>
 
 	<!-- source files here... -->
+
+	<!-- both local and remote versions of Emitter so it will work even if we are offline -->
+	<script type="text/javascript" src="http://caplin.github.io/Emitter/lib/Emitter.js"></script>
 	<script type="text/javascript" src="../node_modules/Emitter/lib/Emitter.js"></script>
+
 	<script type="text/javascript" src="../target/single/fell.js"></script>
 
 	<!-- spec files here... -->
