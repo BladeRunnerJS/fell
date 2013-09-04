@@ -40,8 +40,11 @@ You'll also need the Emitter dependency which is available from [here](http://ca
 The following lines will pull the libraries from github. For a proper deployment, you should
 download them or check them out of github.
 
+```
+
    <script type="text/javascript" src="http://caplin.github.io/Emitter/lib/Emitter.js"></script>
    <script type="text/javascript" src="http://caplin.github.io/fell/target/single/fell.js"></script>
+```
 
 In node, add fell to your package.json dependencies:
 
