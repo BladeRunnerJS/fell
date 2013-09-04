@@ -174,7 +174,10 @@ Here's an example of usage:
 
 
     // test code
-    JsHamcrest.Integration.jasmine();
+
+    // Note:  This will only work if JsHamcrest.Integration.jasmine() was run
+    // sometime before the LogStore was defined.
+
     describe('My object', function() {
     	var Log = fell.Log;
     	var LogStore = fell.destination.LogStore;
@@ -189,14 +192,25 @@ Here's an example of usage:
     	it('when constructed, logs at info with its version and the parameter.', function() {
     		var myObj = new MyObject(23);
 
-			assertThat(store, LogStore.contains(
-					LogStore.event(
-						'info',
-						'mymodule.MyObject',
-						[MyObject.LOG_MESSAGES['initialising'], MyObject.version, 23]
-					)
-				)
-			);
+    		assertThat(store, LogStore.contains(
+    				LogStore.event(
+    					'info',
+    					'mymodule.MyObject',
+    					[MyObject.LOG_MESSAGES['initialising'], MyObject.version, 23]
+    				)
+    			)
+    		);
+
+    		// or if the only thing we really care about is that the parameter
+    		// is in the log message:
+
+    		assertThat(store, LogStore.contains(
+    				LogStore.event(
+    					anything(), anything(), hasItem(23)
+    				)
+    			)
+    		);
+
     	}
 ```
 
