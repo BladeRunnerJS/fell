@@ -29,6 +29,7 @@ Aims
 * Friendly to unit testing.
 * Allows you to log at different levels from within different pieces of code.
 * Works in both node.js and the browser.
+* Quick and easy to get started with.
 
 Usage
 -----
