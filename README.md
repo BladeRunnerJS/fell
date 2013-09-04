@@ -41,7 +41,6 @@ The following lines will pull the libraries from github. For a proper deployment
 download them or check them out of github.
 
 ```
-
    <script type="text/javascript" src="http://caplin.github.io/Emitter/lib/Emitter.js"></script>
    <script type="text/javascript" src="http://caplin.github.io/fell/target/single/fell.js"></script>
 ```
@@ -148,27 +147,10 @@ If you want to modify the logging while in use you can use methods specifically 
 Testing
 -------
 
-The LogStore destination has special features to support log message testing.
-
-Testing for log messages can lead to fragile tests, but such tests can be useful if done carefully.
-
-### Log Testing Advice
-
-* Never check that the log messages you are expecting are the only messages that have been logged
-during a test. Future code changes may add more log messages, causing your tests to break even
-when there is no bug.
-* Store the actual text of the log message in a staticly referenced map with the code under test,
-and check against that rather than a hardcoded string.  This way, the text of the message can be
-changed easily without breaking the tests.
-* Use a string interpolation function (e.g. the one used here by default) so that parts of the
-message that change do not break the message matching and so that they can be compared separately.
-* Only write tests that check log messages where the log message is part of the interface that
-third parties will rely on.  If a log message exists only for your own debugging, don't test that.
-
-### Support
+Care must be taken when testing for log messages in order to avoid writing fragile tests.
 
 In order to help with this, the provided LogStore destination detects when it's loaded with [JsHamcrest](http://danielfm.github.io/jshamcrest)
-integrated, and provides a number of matchers.
+integrated, and provides a number of jshamcrest matchers to be used when unit testing.
 
 Here's an example of usage:
 
@@ -238,4 +220,16 @@ makes sense for the code to do.  So if your code currently logs at 'debug', but 
 sense for it to log the same message at 'info', check against `either('debug').or('info')` rather
 than checking against what your code actually does.
 
-The aim is to write tests that fail only when there is a bug.
+There is no matcher to check that no other log messages have been logged, since this is a test
+antipattern - future code changes may add more log messages, causing your tests to break even
+when there is no bug.
+
+In the above example, I store the actual text of the log message in a staticly referenced map with
+the code under test, and check against that rather than a hardcoded string.  This way, the text of
+the message can be changed easily without breaking the tests.
+
+The fell logger by default uses a string interpolation function so that the parts of the message
+that change do not break the message matching and so that they can be compared separately.
+
+Despite these advantages, you should avoid testing log messages except where the messages form part
+of your public interface that others might rely on.
