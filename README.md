@@ -34,7 +34,7 @@ Aims
 Usage
 -----
 
-In a web browser, you'll want to include the js file <a href="target\single\fell.js">target\single\fell.js</a>.
+In a web browser, you'll want to include the js file <a href="target\single\fell.js">fell.js</a>.
 You'll also need the Emitter dependency which is available from [here](http://caplin.github.io/Emitter).
 
 The following lines will pull the libraries from github. For a proper deployment, you should
