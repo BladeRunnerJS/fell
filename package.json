@@ -2,10 +2,10 @@
   "name": "fell",
   "version": "0.0.1",
   "description": "A javascript logging framework.",
-  "homepage": "http://caplin.github.io/fell",
+  "homepage": "http://BladeRunnerJS.github.io/fell",
   "license": "MIT",
   "dependencies": {
-    "Emitter": "git+https://github.com/caplin/Emitter.git#gh-pages"
+    "emitter": "git+https://github.com/BladeRunnerJS/emitter.git#gh-pages"
   },
   "devDependencies": {
     "jsdoc3": "git://github.com/jsdoc3/jsdoc.git",
@@ -15,7 +15,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/caplin/fell.git"
+    "url": "https://github.com/BladeRunnerJS/fell.git"
   },
   "main": "./lib/fell.js",
   "scripts": {
