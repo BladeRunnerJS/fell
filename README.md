@@ -34,6 +34,20 @@ Aims
 Usage
 -----
 
+In a web browser, you'll want to include the js file <a href="target\single\fell.js">target\single\fell.js</a>.
+You'll also need the Emitter dependency which is available from [here](http://caplin.github.io/Emitter).
+
+The following lines will pull the libraries from github. For a proper deployment, you should
+download them or check them out of github.
+
+   <script type="text/javascript" src="http://caplin.github.io/Emitter/lib/Emitter.js"></script>
+   <script type="text/javascript" src="http://caplin.github.io/fell/target/single/fell.js"></script>
+
+In node, add fell to your package.json dependencies:
+
+    npm install --save fell@git+https://github.com/caplin/fell.git#gh-pages
+
+
 ###  Getting the Log object.
 
 Start by getting the Log object.
@@ -150,7 +164,7 @@ third parties will rely on.  If a log message exists only for your own debugging
 
 ### Support
 
-In order to help with this, the StoreLog destination detects when it's loaded with [JsHamcrest](http://danielfm.github.io/jshamcrest)
+In order to help with this, the provided LogStore destination detects when it's loaded with [JsHamcrest](http://danielfm.github.io/jshamcrest)
 integrated, and provides a number of matchers.
 
 Here's an example of usage:

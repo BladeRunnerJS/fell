@@ -5,7 +5,7 @@
   "homepage": "http://caplin.github.io/fell",
   "license": "MIT",
   "dependencies": {
-    "Emitter": "git+https://github.com/kybernetikos/Emitter.git#gh-pages"
+    "Emitter": "git+https://github.com/caplin/Emitter.git#gh-pages"
   },
   "devDependencies": {
     "jsdoc3": "git://github.com/jsdoc3/jsdoc.git",
