@@ -231,5 +231,6 @@ the message can be changed easily without breaking the tests.
 The fell logger by default uses a string interpolation function so that the parts of the message
 that change do not break the message matching and so that they can be compared separately.
 
-Despite these advantages, you should still avoid testing for log messages except where the messages
-form part of your public interface that others might rely on.
+Fell matchers don't require you to test every log message. This is desirable, as many log messages
+don't form part of your public interface, and testing them would increase the frailty of the tests
+without providing any benefit.
