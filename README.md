@@ -28,8 +28,8 @@ Aims
 * Very low cost when logging at a level not in use.
 * Friendly to unit testing.
 * Allows you to log at different levels from within different pieces of code.
-* Works in both node.js and the browser.
 * Quick and easy to get started with.
+* Works in both node.js and the browser.
 
 Usage
 -----
@@ -231,5 +231,5 @@ the message can be changed easily without breaking the tests.
 The fell logger by default uses a string interpolation function so that the parts of the message
 that change do not break the message matching and so that they can be compared separately.
 
-Despite these advantages, you should avoid testing log messages except where the messages form part
-of your public interface that others might rely on.
+Despite these advantages, you should still avoid testing for log messages except where the messages
+form part of your public interface that others might rely on.
