@@ -64,7 +64,8 @@ using it immediately:
 
 ### Specific Loggers
 
-You can get more fined grained control if you log to specified loggers within your classes.
+You can get more finely grained control if you log to specified loggers within your modules or
+classes.
 
 ```javascript
 
@@ -92,6 +93,117 @@ To take advantage of this control, you can configure particular loggers to log a
     });
 ```
 
-This tells the logging system to use 'error' as the log level for anything that is not a part of
-'mymodule'.  In the earlier example, 'mymodule.MyClass' would have been logged at 'info' level,
-any logger for 'mymodule.some.hierarchy' or lower would only log fatal log messages.
+You can set up your logging by calling configure at the start of your program.  It takes up to three
+arguments.  The first argument is the default log level that will be done for all loggers that don't
+have more specific configuration.
+
+The second argument is a map containing logger names to the levels that they should log at.  This
+is interpreted hierarchically, so in the above example the logger `mymodule.MyClass` will log at
+level `info`, since it matches the `mymodule` configuration.  The logger `mymodule.some.hierarchy`
+will log at level `fatal`, as will any loggers with names that start `mymodule.some.hierarchy.`.
+
+The third argument is an array of destinations that log events should be routed too.  If you don't
+pass anything (as in the above example), this will default to an array containing only a logger that
+outputs to the console object in environments that support this.
+
+Calling `Log.configure` clears the state of the logger, so the levels, configuration and log
+destinations are all reset.
+
+If you want to modify the logging while in use you can use methods specifically for that:
+
+```javascript
+
+    // Changes the log level for things not configured specifically.
+    Log.changeLevel('error');
+
+    // Changes the log level for mymodule.MyClass and things below it.
+    Log.changeLevel('mymodule.MyClass', 'warn');
+
+    // Adds a new destination that stores the most recent 10 log events.
+    var store = new fell.destination.LogStore(10);
+    Log.addDestination(store);
+
+    // Removes the previously added destination.
+    Log.removeDestination(store);
+```
+
+Testing
+-------
+
+The LogStore destination has special features to support log message testing.
+
+Testing for log messages can lead to fragile tests, but such tests can be useful if done carefully.
+
+### Log Testing Advice
+
+* Never check that the log messages you are expecting are the only messages that have been logged
+during a test. Future code changes may add more log messages, causing your tests to break even
+when there is no bug.
+* Store the actual text of the log message in a staticly referenced map with the code under test,
+and check against that rather than a hardcoded string.  This way, the text of the message can be
+changed easily without breaking the tests.
+* Use a string interpolation function (e.g. the one used here by default) so that parts of the
+message that change do not break the message matching and so that they can be compared separately.
+* Only write tests that check log messages where the log message is part of the interface that
+third parties will rely on.  If a log message exists only for your own debugging, don't test that.
+
+### Support
+
+In order to help with this, the StoreLog destination detects when it's loaded with [JsHamcrest](http://danielfm.github.io/jshamcrest)
+integrated, and provides a number of matchers.
+
+Here's an example of usage:
+
+```javascript
+
+    // code under test
+    var Log = typeof fell !== 'undefined' ? fell.Log : require('fell').Log;
+
+    function MyObject(parameter) {
+    	this.log = Log.getLogger('mymodule.MyObject');
+
+    	this.info(MyObject.LOG_MESSAGES['initialising'], MyObject.version, parameter);
+    }
+
+    MyObject.LOG_MESSAGES = {
+    	'initialising': 'Initialising MyObject, version {0}, with parameter {1}.'
+    }
+
+    MyObject.version = "1.2.3";
+
+
+
+    // test code
+    JsHamcrest.Integration.jasmine();
+    describe('My object', function() {
+    	var Log = fell.Log;
+    	var LogStore = fell.destination.LogStore;
+
+    	var store;
+
+    	beforeEach(function() {
+    		store = new LogStore();
+    		Log.configure("info", {}, [store]);
+    	});
+
+    	it('when constructed, logs at info with its version and the parameter.', function() {
+    		var myObj = new MyObject(23);
+
+			assertThat(store, LogStore.contains(
+					LogStore.event(
+						'info',
+						'mymodule.MyObject',
+						[MyObject.LOG_MESSAGES['initialising'], MyObject.version, 23]
+					)
+				)
+			);
+    	}
+```
+
+The provided matchers, `LogStore.contains`, `LogStore.containsAll` and `LogStore.event` also accept
+JsHamcrest matchers as arguments.  You can make your tests less brittle by accepting anything that
+makes sense for the code to do.  So if your code currently logs at 'debug', but it would also make
+sense for it to log the same message at 'info', check against `either('debug').or('info')` rather
+than checking against what your code actually does.
+
+The aim is to write tests that fail only when there is a bug.
