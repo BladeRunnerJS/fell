@@ -20,6 +20,18 @@ function derelativise(context, path) {
 	return result.join("/");
 }
 
+// Sham for Object.defineProperty
+var defineProperty = function(obj, prop, descriptor) {
+	obj[prop] = descriptor.value;
+};
+if (Object.defineProperty) {
+	try {
+		// IE8 throws an error here.
+		Object.defineProperty({}, 'x', {});
+		defineProperty = Object.defineProperty;
+	} catch (e) {}
+}
+
 function realm() {
 	var moduleDefinitions = {};
 	var incompleteExports = {};
@@ -44,7 +56,7 @@ function realm() {
 		var definition = moduleDefinitions[id];
 		if (definition == null) { throw new Error("No definition for module " + id + " has been loaded."); }
 		var module = { exports: {} };
-		Object.defineProperty(module, 'id', {
+		defineProperty(module, 'id', {
 			value: id, configurable: false, writable: false, enumerable: true
 		});
 		incompleteExports[id] = module;

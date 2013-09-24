@@ -32,6 +32,18 @@
 		return result.join("/");
 	}
 	
+	// Sham for defineProperty
+	var defineProperty = function(obj, prop, descriptor) {
+		obj[prop] = descriptor.value;
+	};
+	if (Object.defineProperty) {
+		try {
+			// IE8 throws an error here.
+			Object.defineProperty({}, 'x', {});
+			defineProperty = Object.defineProperty;
+		} catch (e) {}
+	}
+	
 	function realm() {
 		var moduleDefinitions = {};
 		var incompleteExports = {};
@@ -56,7 +68,7 @@
 			var definition = moduleDefinitions[id];
 			if (definition == null) { throw new Error("No definition for module " + id + " has been loaded."); }
 			var module = { exports: {} };
-			Object.defineProperty(module, 'id', {
+			defineProperty(module, 'id', {
 				value: id, configurable: false, writable: false, enumerable: true
 			});
 			incompleteExports[id] = module;
@@ -75,9 +87,9 @@
 	var require = libraryRealm.require.bind(null, "");
 	
 // fell v0.0.1 packaged for the browser.
-// 2013-09-03T19:39:43.000Z
+// 2013-09-24T10:30:46.000Z
 
-// destination\ConsoleLog.js (modified 20:15:12)
+// destination\ConsoleLog.js (modified 10:10:17)
 define('fell/lib/destination/ConsoleLog', function(require, exports, module) {
 	"use strict";
 	
@@ -122,7 +134,7 @@ define('fell/lib/destination/ConsoleLog', function(require, exports, module) {
 	module.exports = ConsoleLogDestination;
 });
 
-// destination\LogStore.js (modified 20:17:27)
+// destination\LogStore.js (modified 10:10:17)
 define('fell/lib/destination/LogStore', function(require, exports, module) {
 	"use strict";
 	
@@ -224,7 +236,7 @@ define('fell/lib/destination/LogStore', function(require, exports, module) {
 	module.exports = LogStore;
 });
 
-// fell.js (modified 19:19:23)
+// fell.js (modified 10:10:17)
 define('fell/lib/fell', function(require, exports, module) {
 	module.exports = {
 		Log: require('./Log'),
@@ -237,13 +249,13 @@ define('fell/lib/fell', function(require, exports, module) {
 	};
 });
 
-// Levels.js (modified 14:30:47)
+// Levels.js (modified 10:10:17)
 define('fell/lib/Levels', function(require, exports, module) {
 	module.exports = ["fatal", "error", "warn", "info", "debug"];
 	
 });
 
-// Log.js (modified 20:18:24)
+// Log.js (modified 10:10:17)
 define('fell/lib/Log', function(require, exports, module) {
 	"use strict";
 	
@@ -358,7 +370,7 @@ define('fell/lib/Log', function(require, exports, module) {
 	module.exports = new Log();
 });
 
-// Logger.js (modified 20:19:52)
+// Logger.js (modified 10:10:17)
 define('fell/lib/Logger', function(require, exports, module) {
 	"use strict";
 	
@@ -410,7 +422,7 @@ define('fell/lib/Logger', function(require, exports, module) {
 	module.exports = Logger;
 });
 
-// RingBuffer.js (modified 20:21:41)
+// RingBuffer.js (modified 15:30:56)
 define('fell/lib/RingBuffer', function(require, exports, module) {
 	"use strict";
 	
@@ -591,7 +603,7 @@ define('fell/lib/RingBuffer', function(require, exports, module) {
 	module.exports = RingBuffer;
 });
 
-// Utils.js (modified 20:25:03)
+// Utils.js (modified 10:10:17)
 define('fell/lib/Utils', function(require, exports, module) {
 	"use strict";
 	
