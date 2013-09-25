@@ -1,5 +1,5 @@
 // fell v0.0.1 packaged for the browser.
-// 2013-09-25T10:02:05.000Z
+// 2013-09-25T10:35:05.000Z
 
 // destination\ConsoleLog.js (modified 10:10:17)
 define('fell/lib/destination/ConsoleLog', function(require, exports, module) {
@@ -148,17 +148,20 @@ define('fell/lib/destination/LogStore', function(require, exports, module) {
 	module.exports = LogStore;
 });
 
-// fell.js (modified 10:10:17)
+// fell.js (modified 11:34:00)
 define('fell/lib/fell', function(require, exports, module) {
 	module.exports = {
 		Log: require('./Log'),
 		RingBuffer: require('./RingBuffer'),
 		Utils: require('./Utils'),
 		destination: {
-			ConsoleLog: require('./destination/ConsoleLog'),
 			LogStore: require('./destination/LogStore')
 		}
 	};
+	
+	if (typeof console !== "undefined") {
+		module.exports.destination.ConsoleLog = require('./destination/ConsoleLog');
+	}
 });
 
 // Levels.js (modified 10:10:17)
@@ -167,14 +170,13 @@ define('fell/lib/Levels', function(require, exports, module) {
 	
 });
 
-// Log.js (modified 10:51:31)
+// Log.js (modified 11:35:05)
 define('fell/lib/Log', function(require, exports, module) {
 	"use strict";
 	
 	var Emitter = require('Emitter');
 	var Logger = require('./Logger');
 	var Levels = require('./Levels');
-	var ConsoleLogDestination = require('./destination/ConsoleLog');
 	
 	var DEFAULT_COMPONENT = "[default]";
 	
@@ -214,7 +216,7 @@ define('fell/lib/Log', function(require, exports, module) {
 		this.rootLogger = this.getLogger();
 	
 		this.off();
-		destinations = destinations || (typeof console !== 'undefined' ? [new ConsoleLogDestination()] : []);
+		destinations = destinations || (typeof console !== 'undefined' ? [new require('./destination/ConsoleLog')()] : []);
 		for (var i = 0; i < destinations.length; ++i) {
 			this.addDestination(destinations[i]);
 		}
