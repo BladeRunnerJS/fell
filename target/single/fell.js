@@ -32,7 +32,7 @@
 		return result.join("/");
 	}
 	
-	// Sham for defineProperty
+	// Sham for Object.defineProperty
 	var defineProperty = function(obj, prop, descriptor) {
 		obj[prop] = descriptor.value;
 	};
@@ -87,7 +87,7 @@
 	var require = libraryRealm.require.bind(null, "");
 	
 // fell v0.0.1 packaged for the browser.
-// 2013-09-24T10:30:46.000Z
+// 2013-09-25T10:02:05.000Z
 
 // destination\ConsoleLog.js (modified 10:10:17)
 define('fell/lib/destination/ConsoleLog', function(require, exports, module) {
@@ -255,7 +255,7 @@ define('fell/lib/Levels', function(require, exports, module) {
 	
 });
 
-// Log.js (modified 10:10:17)
+// Log.js (modified 10:51:31)
 define('fell/lib/Log', function(require, exports, module) {
 	"use strict";
 	
@@ -603,7 +603,7 @@ define('fell/lib/RingBuffer', function(require, exports, module) {
 	module.exports = RingBuffer;
 });
 
-// Utils.js (modified 10:10:17)
+// Utils.js (modified 11:02:05)
 define('fell/lib/Utils', function(require, exports, module) {
 	"use strict";
 	
@@ -679,7 +679,7 @@ define('fell/lib/Utils', function(require, exports, module) {
 		var message = String(template);
 		message = message.replace(/\{(\d+)\}/g, function(_, argNumber) {
 			argNumber = Number(argNumber);
-			return args[argNumber + 1];
+			return String(args[argNumber + 1]);
 		});
 		return message;
 	}
