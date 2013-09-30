@@ -16,7 +16,7 @@ A logging library that works in node and the browser.
 
 * This document is available nicely formatted [here](http://BladeRunnerJS.github.io/fell).
 * Tests are [here](http://BladeRunnerJS.github.io/fell/spec).
-* Source code is [here](https://github.com/BladeRunnerJS/fell).
+* Source code is [here](https://githu`b.com/BladeRunnerJS/fell).
 * JSDoc is [here](http://BladeRunnerJS.github.io/fell/doc) (still a work in progress).
 
 The rendered form of this document includes the fell script so you can open

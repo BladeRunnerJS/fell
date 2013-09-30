@@ -87,7 +87,7 @@
 	var require = libraryRealm.require.bind(null, "");
 	
 // fell v0.0.1 packaged for the browser.
-// 2013-09-25T10:35:05.000Z
+// 2013-09-30T21:20:35.000Z
 
 // destination\ConsoleLog.js (modified 10:10:17)
 define('fell/lib/destination/ConsoleLog', function(require, exports, module) {
@@ -236,7 +236,7 @@ define('fell/lib/destination/LogStore', function(require, exports, module) {
 	module.exports = LogStore;
 });
 
-// fell.js (modified 11:34:00)
+// fell.js (modified 22:19:01)
 define('fell/lib/fell', function(require, exports, module) {
 	module.exports = {
 		Log: require('./Log'),
@@ -248,7 +248,8 @@ define('fell/lib/fell', function(require, exports, module) {
 	};
 	
 	if (typeof console !== "undefined") {
-		module.exports.destination.ConsoleLog = require('./destination/ConsoleLog');
+		var ConsoleLogDestination = require('./destination/ConsoleLog');
+		module.exports.destination.ConsoleLog = new ConsoleLogDestination();
 	}
 });
 
@@ -258,7 +259,7 @@ define('fell/lib/Levels', function(require, exports, module) {
 	
 });
 
-// Log.js (modified 11:35:05)
+// Log.js (modified 22:20:35)
 define('fell/lib/Log', function(require, exports, module) {
 	"use strict";
 	
@@ -304,7 +305,12 @@ define('fell/lib/Log', function(require, exports, module) {
 		this.rootLogger = this.getLogger();
 	
 		this.off();
-		destinations = destinations || (typeof console !== 'undefined' ? [new require('./destination/ConsoleLog')()] : []);
+		if (! destinations && typeof console !== 'undefined') {
+			var ConsoleLogDestination = require('./destination/ConsoleLog');
+			destinations = [new ConsoleLogDestination()];
+		}
+		destinations = destinations || [];
+	
 		for (var i = 0; i < destinations.length; ++i) {
 			this.addDestination(destinations[i]);
 		}
