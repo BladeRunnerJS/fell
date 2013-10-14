@@ -35,7 +35,7 @@ Usage
 -----
 
 In a web browser, you'll want to include the js file <a href="target\single\fell.js">fell.js</a>.
-You'll also need the Emitter dependency which is available from [here](http://BladeRunnerJS.github.io/Emitter).
+You'll also need the Emitter dependency which is available from [here](http://BladeRunnerJS.github.io/emitter).
 
 The following lines will pull the libraries from github. For a proper deployment, you should
 download them or check them out of github.
