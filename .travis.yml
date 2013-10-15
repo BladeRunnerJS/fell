@@ -1,11 +1,12 @@
 env: 
   global: 
-  - secure: MNAXmNZnWKtMD+YNCM2NSZFdb/YFQ8SsK8VWqadYLlUI+KMJFc+NOdTxZEw3oRRbQ1U+rFFD+hSXsNJEnPXAYhtXHrFrUOdFzXnhMhUATxegu5QMGn4bZXKAwynYkxMQ45jdcBaPYd16CSzEcLHYsYjigo0XJYfc7/sdnGvtuIY=
-  - secure: umoYmYvNAKFkzMiiIFFHoT8p4noHoHfiPtS9WjRscEVm6J10Pv0fDfOyZYSK7+nxMZBEZ28Intbaxkjw2wsWK5hjduPCt1Jyh5OF2zo7kxvhsmIhGxYYA993eqU4yMqsBsvE5ra0ezxkYdehWnzaupSTjiRU8V+/GhPsGPcbiG0=
+  - secure: UypiYh3Vzj4z2PM2gsUuYv1yvsCS6ZWrQ6RgRXFSwCmhlAs2LRQVPHa4Xqok68p8mRP+QF78hldmicbOWY8Vu429s5zlEcDpByLqwm+kWXztUqGow0nIPRfDo29sSTaM7ddoJLN2a83LJB3TvarlMScxvPfRTFSpjq6ZbK1hlg4=
+  - secure: PbB/f0u0qgrE6XXoypTBKw8A5KGMTc9LC9XJ1+WvAXsogWhNME4qMoZwXetXUoHEyGnHnsUy3u/UVxhNEyZufRVLSLiFjHVHCZGGw3Y0du9Xi+0r6YhALtmxI9fazHY4RFlIY2fvM2+rTa+bgWODWJmn/NXZjUxvTr9sXp+adP0=
 before_script: 
 - npm install -g grunt-cli
 - git submodule update --init --recursive
 script:
+- npm test
 - npm run-script saucelabs-test
 node_js: 
 - 0.1
