@@ -14,6 +14,8 @@ fell
 
 A logging library that works in node and the browser.
 
+[![Build Status](https://travis-ci.org/BladeRunnerJS/fell.png)](https://travis-ci.org/BladeRunnerJS/fell)
+
 * This document is available nicely formatted [here](http://BladeRunnerJS.github.io/fell).
 * Tests are [here](http://BladeRunnerJS.github.io/fell/spec).
 * Source code is [here](https://githu`b.com/BladeRunnerJS/fell).
