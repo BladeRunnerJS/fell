@@ -26,6 +26,7 @@
   "main": "./lib/fell.js",
   "scripts": {
     "test": "jasmine-node --verbose spec",
+    "saucelabs-test": "grunt saucelabs-test",
     "doc": "jsdoc lib -d doc",
     "prepublish": "node build/package.js"
   }
