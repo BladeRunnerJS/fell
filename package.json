@@ -8,7 +8,6 @@
     "emitter": "git+https://github.com/BladeRunnerJS/emitter.git#gh-pages"
   },
   "devDependencies": {
-    "emitter": "https://github.com/BladeRunnerJS/emitter/tarball/gh-pages/",
     "jsdoc3": "git://github.com/jsdoc3/jsdoc.git",
     "jshamcrest": "0.7.x",
     "jasmine-node": "1.11.x",
