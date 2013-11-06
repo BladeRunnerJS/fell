@@ -1,18 +1,6 @@
 describe('The Log Utility ', function() {
 	var global = (function() {return this;})();
-	var Util =  global.fell ? global.fell.Utils : require("../lib/Utils");
-/*
-
-	module.exports = {
-		format: format,
-		padBefore: padBefore,
-		padAfter: padAfter,
-		interpolate: interpolate,
-		templateFormatter: templateFormatter,
-		ansiFormatter: ansiFormatter,
-		allowAll: allowAll
-	};
-	*/
+	var Util =  global.fell ? global.fell.Utils : require("..").Utils;
 
 	it('provides an interpolation function.', function() {
 		expect(Util.interpolate(""))

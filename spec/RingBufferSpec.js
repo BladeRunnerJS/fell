@@ -1,6 +1,6 @@
 describe('A RingBuffer ', function(){
 	var global = (function() {return this;})();
-	var RingBuffer = global.fell ? global.fell.RingBuffer : require("../lib/RingBuffer");
+	var RingBuffer = global.fell ? global.fell.RingBuffer : require("..").RingBuffer;
 
 	it('should throw exceptions when constructed with invalid arguments.', function() {
 		expect(function() {

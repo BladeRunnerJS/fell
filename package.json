@@ -1,11 +1,11 @@
 {
   "name": "fell",
-  "version": "0.0.1",
-  "description": "A javascript logging framework.",
+  "version": "0.0.2",
+  "description": "A simple javascript logging framework.",
   "homepage": "http://BladeRunnerJS.github.io/fell",
   "license": "MIT",
   "dependencies": {
-    "emitr": "git+https://github.com/BladeRunnerJS/emitr.git#gh-pages"
+    "emitr": "0.0.x"
   },
   "devDependencies": {
     "webbuilder": "git://github.com/BladeRunnerJS/webbuilder.git",

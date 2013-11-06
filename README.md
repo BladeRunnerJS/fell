@@ -4,9 +4,6 @@ permalink: /index.html
 title: fell logging
 ---
 
-<script type="text/javascript" src="node_modules/emitter/lib/Emitter.js"></script>
-<script type="text/javascript" src="http://BladeRunnerJS.github.io/emitter/lib/Emitter.js"></script>
-
 <script type="text/javascript" src="target/single/fell.js"></script>
 
 fell
@@ -36,21 +33,24 @@ Aims
 Usage
 -----
 
-In a web browser, you'll want to include the js file <a href="target\single\fell.js">fell.js</a>.
-You'll also need the Emitter dependency which is available from [here](http://BladeRunnerJS.github.io/emitter).
+In a web browser, you'll want to include the js file <a href="target/single/fell.js">fell.js</a>.
+
+If you are using the emitr dependency separately, you should include it first and use the
+<a href="target/single/fell-no-emitr.js">fell-no-emitr.js</a> file instead.
+
+You can get the emitr dependency separately from [here](http://BladeRunnerJS.github.io/emitter).
 
 The following lines will pull the libraries from github. For a proper deployment, you should
 download them or check them out of github.
 
 ```
-   <script type="text/javascript" src="http://BladeRunnerJS.github.io/emitter/lib/Emitter.js"></script>
-   <script type="text/javascript" src="http://BladeRunnerJS.github.io/fell/target/single/fell.js"></script>
+   <script type="text/javascript" src="http://BladeRunnerJS.github.io/emitr/target/single/emitr.js"></script>
+   <script type="text/javascript" src="http://BladeRunnerJS.github.io/fell/target/single/fell-no-emitr.js"></script>
 ```
 
 In node, add fell to your package.json dependencies:
 
-    npm install --save fell@git+https://github.com/BladeRunnerJS/fell.git#gh-pages
-
+    npm install --save fell
 
 ###  Getting the Log object.
 

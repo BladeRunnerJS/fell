@@ -3,7 +3,7 @@ describe('A Log object', function(){
 	var JsHamcrest = global.JsHamcrest || require('jshamcrest').JsHamcrest;
 	JsHamcrest.Integration.jasmine();
 
-	var fell = global.fell || require("../lib/fell");
+	var fell = global.fell || require("..");
 	var Log = fell.Log;
 	var LogStore = fell.destination.LogStore;
 
