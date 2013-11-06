@@ -3,7 +3,7 @@
 // imports
 var fs = require('fs-extra');
 var path = require('path');
-var webbuild = require('webbuild');
+var webbuild = require('webbuilder');
 
 // fields
 var now = new Date();
@@ -24,13 +24,13 @@ webbuild(libraryDir, {
 });
 
 // Build a 'standalone' package that doesn't include emtr (so it must already be on the page).
-var noEmtrOut = path.join(libraryDir, "/target/single/"+moduleName+"-no-emtr.js");
+var noEmtrOut = path.join(libraryDir, "/target/single/"+moduleName+"-no-emitr.js");
 webbuild(libraryDir, {
 	out: noEmtrOut,
 	prefix: "// "+ moduleName + " built for browser " + now.toISOString() + "\n",
 	includeSystem: true,
 	withDependencies: true,
-	dontBundle: "emtr"
+	dontBundle: "emitr"
 });
 
 // Build a bundle that expects there to already be a require/define

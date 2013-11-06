@@ -8,7 +8,7 @@
     "emitr": "git+https://github.com/BladeRunnerJS/emitr.git#gh-pages"
   },
   "devDependencies": {
-    "webbuild": "git://github.com/BladeRunnerJS/webbuild.git",
+    "webbuilder": "git://github.com/BladeRunnerJS/webbuilder.git",
     "jsdoc3": "git://github.com/jsdoc3/jsdoc.git",
     "jshamcrest": "0.7.x",
     "jasmine-node": "1.11.x",
