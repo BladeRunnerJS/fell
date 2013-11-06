@@ -1,17 +1,195 @@
-// fell v0.0.1 packaged for the browser.
-// 2013-10-09T10:36:43.000Z
-
-// Levels.js (modified 11:36:43)
-define('fell/lib/Levels', function(require, exports, module) {
-	module.exports = ["fatal", "error", "warn", "info", "debug"];
-	
+// fell built for bundle module system 2013-11-06T15:14:37.855Z
+define("fell", function(require, exports, module) {
+	module.exports = require("./lib/fell");
 });
-
-// Log.js (modified 11:36:43)
-define('fell/lib/Log', function(require, exports, module) {
+define("fell/lib/fell", function(require, exports, module) {
+	module.exports = {
+		Log: require('./Log'),
+		RingBuffer: require('./RingBuffer'),
+		Utils: require('./Utils'),
+		destination: {
+			LogStore: require('./destination/LogStore')
+		}
+	};
+	
+	if (typeof console !== "undefined") {
+		var ConsoleLogDestination = require('./destination/ConsoleLog');
+		module.exports.destination.ConsoleLog = new ConsoleLogDestination();
+	}
+});
+define("fell/lib/Utils", function(require, exports, module) {
 	"use strict";
 	
-	var Emitter = require('Emitter');
+	var DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+	var MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+	
+	/**
+	 * Formats a date according to a provided pattern.  The pattern is intended to be compatible with
+	 * the Java SimpleDateFormatter.
+	 *
+	 * @param pattern
+	 * @param date
+	 * @returns {string}
+	 */
+	function format(pattern, date) {
+		if (date == null) { date = new Date(); }
+		var dayNo = date.getDay();
+		var dateNo = date.getDate();
+		var month = date.getMonth();
+		var hour = date.getHours();
+		var minute = date.getMinutes();
+		var sec = date.getSeconds();
+		var millis = date.getMilliseconds();
+		var fullYear = date.getFullYear();
+	
+		return pattern
+				.replace(/HH/g, padBefore(hour, 2, "0"))
+				.replace(/H/g, hour)
+				.replace(/mm/g, padBefore(minute, 2, "0"))
+				.replace(/m/g, minute)
+				.replace(/ss/g, padBefore(sec, 2, "0"))
+				.replace(/s/g, sec)
+				.replace(/SSS/g, padBefore(millis, 3, "0"))
+				.replace(/S/g, millis)
+				.replace(/yyyy/g, fullYear)
+				.replace(/yy/g, String(fullYear).substring(2))
+				.replace(/dd/g, padBefore(dateNo, 2, "0"))
+				.replace(/d/g, dateNo)
+				.replace(/MMMM/g, MONTH_NAMES[month])
+				.replace(/MMM/g, MONTH_NAMES[month].substring(0, 3))
+				.replace(/MM/g, padBefore(month + 1, 2, "0"))
+				.replace(/M/g, month + 1)
+				.replace(/EEEE/g, DAY_NAMES[dayNo])
+				.replace(/EEE/g, DAY_NAMES[dayNo].substring(0, 3));
+	}
+	
+	function padAfter(val, length, paddingCharacter) {
+		val = String(val);
+		if (val.length >= length) return val;
+		var result = val + (new Array(length).join(paddingCharacter) + paddingCharacter);
+		return result.substring(0, length);
+	}
+	
+	function padBefore(val, length, paddingCharacter) {
+		val = String(val);
+		if (val.length >= length) return val;
+		var result = (new Array(length).join(paddingCharacter) + paddingCharacter) + val;
+		return result.substring(result.length - length);
+	}
+	
+	/**
+	 * Does string interpolation.  Replaces {n} in the first argument with the (n + 1)th argument to
+	 * this function.
+	 *
+	 * @param template
+	 * @returns {*}
+	 */
+	function interpolate(template) {
+		if (template === null || template === undefined) {
+			return template;
+		}
+		var args = arguments;
+		var message = String(template);
+		message = message.replace(/\{(\d+)\}/g, function(_, argNumber) {
+			argNumber = Number(argNumber);
+			return String(args[argNumber + 1]);
+		});
+		return message;
+	}
+	
+	/**
+	 * A default formatter to convert log events to strings.
+	 * @param time
+	 * @param component
+	 * @param level
+	 * @param data
+	 * @returns {string}
+	 */
+	function templateFormatter(time, component, level, data) {
+		var date = new Date(time);
+		return format("yyyy-MM-dd HH:mm:ss.SSS", date)
+				+ " ["
+				+ padAfter(level, 5, " ")
+				+ "] ["
+				+ padAfter(component, 18, " ")
+				+ "] : "
+				+ interpolate.apply(null, data);
+	}
+	
+	// see http://en.wikipedia.org/wiki/ANSI_escape_code
+	// this is to make the output nicer in the node console.
+	var colors = {
+		black: 0, red: 1, green: 2, yellow: 3, blue: 4, magenta: 5, cyan: 6, white: 7
+	};
+	
+	function style(str, style) {
+		var startCodes = [];
+		var endCodes = [];
+		for (var key in style) {
+			if (key === 'color' || key === 'background') {
+				var base = (key === 'color' ? 30 : 40);
+				var styleParts = style[key].split(" ");
+				var color = styleParts[styleParts.length - 1];
+				var isBright = false;
+				if (styleParts[0] === 'bright') {
+					isBright = true;
+				}
+				startCodes.push("\x1B[" + (base + colors[color]) + (isBright ? ";1m" : "m"));
+				endCodes.push("\x1B[" + (base + 9) + (isBright ? ";22m" : "m"))
+			}
+			// maybe add some of the other ansi styles in future.
+		}
+		return startCodes.join("") + str + endCodes.reverse().join("");
+	}
+	
+	var LEVEL_STYLES = {
+		"fatal": {color: "bright white", background: "bright red"},
+		"error": {color: "bright red"},
+		"warn": {color: "bright yellow"},
+		"info": {},
+		"debug": {color: "green"}
+	};
+	
+	/**
+	 * A formatter that converts log events to ansi colored strings.
+	 * @param time
+	 * @param component
+	 * @param level
+	 * @param data
+	 * @returns {string}
+	 */
+	function ansiFormatter(time, component, level, data) {
+		var date = new Date(time);
+		return style(format("yyyy-MM-dd HH:mm:ss.SSS", date)
+					+ " [" + padAfter(level, 5, " ")	+ "] ["
+					+ padAfter(component, 18, " ") + "]", LEVEL_STYLES[level])
+				+ " : " + interpolate.apply(null, data);
+	}
+	
+	/**
+	 * A filter that always returns true.
+	 * @param time
+	 * @param component
+	 * @param level
+	 * @param data
+	 * @returns {boolean}
+	 */
+	function allowAll(time, component, level, data) {
+		return true;
+	}
+	
+	module.exports = {
+		format: format,
+		interpolate: interpolate,
+		templateFormatter: templateFormatter,
+		ansiFormatter: ansiFormatter,
+		allowAll: allowAll
+	};
+});
+define("fell/lib/Log", function(require, exports, module) {
+	"use strict";
+	
+	var Emitter = require('emtr');
 	var Logger = require('./Logger');
 	var Levels = require('./Levels');
 	
@@ -125,61 +303,7 @@ define('fell/lib/Log', function(require, exports, module) {
 	
 	module.exports = new Log();
 });
-
-// Logger.js (modified 11:36:43)
-define('fell/lib/Logger', function(require, exports, module) {
-	"use strict";
-	
-	var Levels = require('./Levels');
-	
-	function NOOP() {};
-	
-	/**
-	 * Creates a Logger class specific to a component.
-	 *
-	 * @private
-	 * @param emitter
-	 * @param component
-	 * @constructor
-	 */
-	function Logger(emitter, component) {
-		this.component = component;
-		this.emitter = emitter;
-	}
-	
-	// creates a method for each of the log levels.
-	Levels.forEach(function(level) {
-		Logger.prototype[level] = function() {
-			this.emitter.trigger('log', Date.now(), this.component, level, arguments);
-		};
-	});
-	
-	/**
-	 * Creates instance methods pointing to the NOOP function for
-	 * logging methods that should have no effect.
-	 *
-	 * @param level
-	 * @private
-	 */
-	Logger.prototype._setLevel = function(level) {
-		var dontLogThisLevel = true;
-		for (var i = Levels.length - 1; i >= 0; --i ) {
-			if (Levels[i] === level) {
-				dontLogThisLevel = false;
-			}
-			if (dontLogThisLevel) {
-				this[Levels[i]] = NOOP;
-			} else if (this.hasOwnProperty(Levels[i])) {
-				delete this[Levels[i]];
-			}
-		}
-	};
-	
-	module.exports = Logger;
-});
-
-// RingBuffer.js (modified 11:36:43)
-define('fell/lib/RingBuffer', function(require, exports, module) {
+define("fell/lib/RingBuffer", function(require, exports, module) {
 	"use strict";
 	
 	var Utils = require('./Utils');
@@ -358,225 +482,7 @@ define('fell/lib/RingBuffer', function(require, exports, module) {
 	
 	module.exports = RingBuffer;
 });
-
-// Utils.js (modified 11:36:43)
-define('fell/lib/Utils', function(require, exports, module) {
-	"use strict";
-	
-	var DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-	var MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-	
-	/**
-	 * Formats a date according to a provided pattern.  The pattern is intended to be compatible with
-	 * the Java SimpleDateFormatter.
-	 *
-	 * @param pattern
-	 * @param date
-	 * @returns {string}
-	 */
-	function format(pattern, date) {
-		if (date == null) { date = new Date(); }
-		var dayNo = date.getDay();
-		var dateNo = date.getDate();
-		var month = date.getMonth();
-		var hour = date.getHours();
-		var minute = date.getMinutes();
-		var sec = date.getSeconds();
-		var millis = date.getMilliseconds();
-		var fullYear = date.getFullYear();
-	
-		return pattern
-				.replace(/HH/g, padBefore(hour, 2, "0"))
-				.replace(/H/g, hour)
-				.replace(/mm/g, padBefore(minute, 2, "0"))
-				.replace(/m/g, minute)
-				.replace(/ss/g, padBefore(sec, 2, "0"))
-				.replace(/s/g, sec)
-				.replace(/SSS/g, padBefore(millis, 3, "0"))
-				.replace(/S/g, millis)
-				.replace(/yyyy/g, fullYear)
-				.replace(/yy/g, String(fullYear).substring(2))
-				.replace(/dd/g, padBefore(dateNo, 2, "0"))
-				.replace(/d/g, dateNo)
-				.replace(/MMMM/g, MONTH_NAMES[month])
-				.replace(/MMM/g, MONTH_NAMES[month].substring(0, 3))
-				.replace(/MM/g, padBefore(month + 1, 2, "0"))
-				.replace(/M/g, month + 1)
-				.replace(/EEEE/g, DAY_NAMES[dayNo])
-				.replace(/EEE/g, DAY_NAMES[dayNo].substring(0, 3));
-	}
-	
-	function padAfter(val, length, paddingCharacter) {
-		val = String(val);
-		if (val.length >= length) return val;
-		var result = val + (new Array(length).join(paddingCharacter) + paddingCharacter);
-		return result.substring(0, length);
-	}
-	
-	function padBefore(val, length, paddingCharacter) {
-		val = String(val);
-		if (val.length >= length) return val;
-		var result = (new Array(length).join(paddingCharacter) + paddingCharacter) + val;
-		return result.substring(result.length - length);
-	}
-	
-	/**
-	 * Does string interpolation.  Replaces {n} in the first argument with the (n + 1)th argument to
-	 * this function.
-	 *
-	 * @param template
-	 * @returns {*}
-	 */
-	function interpolate(template) {
-		if (template === null || template === undefined) {
-			return template;
-		}
-		var args = arguments;
-		var message = String(template);
-		message = message.replace(/\{(\d+)\}/g, function(_, argNumber) {
-			argNumber = Number(argNumber);
-			return String(args[argNumber + 1]);
-		});
-		return message;
-	}
-	
-	/**
-	 * A default formatter to convert log events to strings.
-	 * @param time
-	 * @param component
-	 * @param level
-	 * @param data
-	 * @returns {string}
-	 */
-	function templateFormatter(time, component, level, data) {
-		var date = new Date(time);
-		return format("yyyy-MM-dd HH:mm:ss.SSS", date)
-				+ " ["
-				+ padAfter(level, 5, " ")
-				+ "] ["
-				+ padAfter(component, 18, " ")
-				+ "] : "
-				+ interpolate.apply(null, data);
-	}
-	
-	// see http://en.wikipedia.org/wiki/ANSI_escape_code
-	// this is to make the output nicer in the node console.
-	var colors = {
-		black: 0, red: 1, green: 2, yellow: 3, blue: 4, magenta: 5, cyan: 6, white: 7
-	};
-	
-	function style(str, style) {
-		var startCodes = [];
-		var endCodes = [];
-		for (var key in style) {
-			if (key === 'color' || key === 'background') {
-				var base = (key === 'color' ? 30 : 40);
-				var styleParts = style[key].split(" ");
-				var color = styleParts[styleParts.length - 1];
-				var isBright = false;
-				if (styleParts[0] === 'bright') {
-					isBright = true;
-				}
-				startCodes.push("\x1B[" + (base + colors[color]) + (isBright ? ";1m" : "m"));
-				endCodes.push("\x1B[" + (base + 9) + (isBright ? ";22m" : "m"))
-			}
-			// maybe add some of the other ansi styles in future.
-		}
-		return startCodes.join("") + str + endCodes.reverse().join("");
-	}
-	
-	var LEVEL_STYLES = {
-		"fatal": {color: "bright white", background: "bright red"},
-		"error": {color: "bright red"},
-		"warn": {color: "bright yellow"},
-		"info": {},
-		"debug": {color: "green"}
-	};
-	
-	/**
-	 * A formatter that converts log events to ansi colored strings.
-	 * @param time
-	 * @param component
-	 * @param level
-	 * @param data
-	 * @returns {string}
-	 */
-	function ansiFormatter(time, component, level, data) {
-		var date = new Date(time);
-		return style(format("yyyy-MM-dd HH:mm:ss.SSS", date)
-					+ " [" + padAfter(level, 5, " ")	+ "] ["
-					+ padAfter(component, 18, " ") + "]", LEVEL_STYLES[level])
-				+ " : " + interpolate.apply(null, data);
-	}
-	
-	/**
-	 * A filter that always returns true.
-	 * @param time
-	 * @param component
-	 * @param level
-	 * @param data
-	 * @returns {boolean}
-	 */
-	function allowAll(time, component, level, data) {
-		return true;
-	}
-	
-	module.exports = {
-		format: format,
-		interpolate: interpolate,
-		templateFormatter: templateFormatter,
-		ansiFormatter: ansiFormatter,
-		allowAll: allowAll
-	};
-});
-
-// destination/ConsoleLog.js (modified 11:36:43)
-define('fell/lib/destination/ConsoleLog', function(require, exports, module) {
-	"use strict";
-	
-	var Utils = require('../Utils');
-	
-	// If we're outputting to a node terminal, then use ANSI color codes to make the log output prettier.
-	var global = Function("return this;")();
-	var defaultFormatter = (global.process && global.process.stdout && Boolean(global.process.stdout.isTTY))
-			? Utils.ansiFormatter : Utils.templateFormatter;
-	
-	// Browsers provide different visual display for different log levels.
-	var CONSOLE_OUTPUT = {
-		"fatal": console.error,
-		"error": console.error,
-		"warn": console.warn,
-		"info": console.info,
-		"debug": console.debug || console.log
-	};
-	
-	/**
-	 * Create a new ConsoleLog destination.
-	 *
-	 * @param [filter] a function that determines whether or not to log specific log events.
-	 * @param [formatter] a function that determines how the log event is converted into a string.
-	 * @constructor
-	 */
-	function ConsoleLogDestination(filter, formatter) {
-		this.filter = filter || Utils.allowAll;
-		this.formatter = formatter || defaultFormatter;
-	};
-	
-	ConsoleLogDestination.prototype.onLog = function(time, component, level, data) {
-		if (this.filter(time, component, level, data)) {
-			this.output(level, this.formatter(time, component, level, data));
-		}
-	};
-	
-	ConsoleLogDestination.prototype.output = function(level, message) {
-		CONSOLE_OUTPUT[level].call(console, message);
-	};
-	
-	module.exports = ConsoleLogDestination;
-});
-
-// destination/LogStore.js (modified 11:36:43)
-define('fell/lib/destination/LogStore', function(require, exports, module) {
+define("fell/lib/destination/LogStore", function(require, exports, module) {
 	"use strict";
 	
 	var Utils = require('../Utils');
@@ -676,22 +582,100 @@ define('fell/lib/destination/LogStore', function(require, exports, module) {
 	
 	module.exports = LogStore;
 });
-
-// fell.js (modified 11:36:43)
-define('fell/lib/fell', function(require, exports, module) {
-	module.exports = {
-		Log: require('./Log'),
-		RingBuffer: require('./RingBuffer'),
-		Utils: require('./Utils'),
-		destination: {
-			LogStore: require('./destination/LogStore')
+define("fell/lib/destination/ConsoleLog", function(require, exports, module) {
+	"use strict";
+	
+	var Utils = require('../Utils');
+	
+	// If we're outputting to a node terminal, then use ANSI color codes to make the log output prettier.
+	var global = Function("return this;")();
+	var defaultFormatter = (global.process && global.process.stdout && Boolean(global.process.stdout.isTTY))
+			? Utils.ansiFormatter : Utils.templateFormatter;
+	
+	// Browsers provide different visual display for different log levels.
+	var CONSOLE_OUTPUT = {
+		"fatal": console.error,
+		"error": console.error,
+		"warn": console.warn,
+		"info": console.info,
+		"debug": console.debug || console.log
+	};
+	
+	/**
+	 * Create a new ConsoleLog destination.
+	 *
+	 * @param [filter] a function that determines whether or not to log specific log events.
+	 * @param [formatter] a function that determines how the log event is converted into a string.
+	 * @constructor
+	 */
+	function ConsoleLogDestination(filter, formatter) {
+		this.filter = filter || Utils.allowAll;
+		this.formatter = formatter || defaultFormatter;
+	};
+	
+	ConsoleLogDestination.prototype.onLog = function(time, component, level, data) {
+		if (this.filter(time, component, level, data)) {
+			this.output(level, this.formatter(time, component, level, data));
 		}
 	};
 	
-	if (typeof console !== "undefined") {
-		var ConsoleLogDestination = require('./destination/ConsoleLog');
-		module.exports.destination.ConsoleLog = new ConsoleLogDestination();
-	}
+	ConsoleLogDestination.prototype.output = function(level, message) {
+		CONSOLE_OUTPUT[level].call(console, message);
+	};
+	
+	module.exports = ConsoleLogDestination;
 });
-
-define('fell', function(require, exports, module) { module.exports = require('fell/lib/fell');});
+define("fell/lib/Levels", function(require, exports, module) {
+	module.exports = ["fatal", "error", "warn", "info", "debug"];
+	
+});
+define("fell/lib/Logger", function(require, exports, module) {
+	"use strict";
+	
+	var Levels = require('./Levels');
+	
+	function NOOP() {};
+	
+	/**
+	 * Creates a Logger class specific to a component.
+	 *
+	 * @private
+	 * @param emitter
+	 * @param component
+	 * @constructor
+	 */
+	function Logger(emitter, component) {
+		this.component = component;
+		this.emitter = emitter;
+	}
+	
+	// creates a method for each of the log levels.
+	Levels.forEach(function(level) {
+		Logger.prototype[level] = function() {
+			this.emitter.trigger('log', Date.now(), this.component, level, arguments);
+		};
+	});
+	
+	/**
+	 * Creates instance methods pointing to the NOOP function for
+	 * logging methods that should have no effect.
+	 *
+	 * @param level
+	 * @private
+	 */
+	Logger.prototype._setLevel = function(level) {
+		var dontLogThisLevel = true;
+		for (var i = Levels.length - 1; i >= 0; --i ) {
+			if (Levels[i] === level) {
+				dontLogThisLevel = false;
+			}
+			if (dontLogThisLevel) {
+				this[Levels[i]] = NOOP;
+			} else if (this.hasOwnProperty(Levels[i])) {
+				delete this[Levels[i]];
+			}
+		}
+	};
+	
+	module.exports = Logger;
+});

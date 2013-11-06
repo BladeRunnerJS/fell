@@ -5,9 +5,10 @@
   "homepage": "http://BladeRunnerJS.github.io/fell",
   "license": "MIT",
   "dependencies": {
-    "emitter": "git+https://github.com/BladeRunnerJS/emitter.git#gh-pages"
+    "emtr": "git+https://github.com/BladeRunnerJS/emtr.git#gh-pages"
   },
   "devDependencies": {
+    "webbuild": "git://github.com/BladeRunnerJS/webbuild.git",
     "jsdoc3": "git://github.com/jsdoc3/jsdoc.git",
     "jshamcrest": "0.7.x",
     "jasmine-node": "1.11.x",
