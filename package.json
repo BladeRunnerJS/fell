@@ -5,7 +5,7 @@
   "homepage": "http://BladeRunnerJS.github.io/fell",
   "license": "MIT",
   "dependencies": {
-    "emtr": "git+https://github.com/BladeRunnerJS/emtr.git#gh-pages"
+    "emitr": "git+https://github.com/BladeRunnerJS/emitr.git#gh-pages"
   },
   "devDependencies": {
     "webbuild": "git://github.com/BladeRunnerJS/webbuild.git",
