@@ -1,2 +1,2 @@
-depends: browser-modules, emtr
-js: target/single/fell-no-emtr.js
+depends: browser-modules, emitr
+js: target/single/fell-no-emitr.js

@@ -23,7 +23,7 @@ webbuild(libraryDir, {
 	withDependencies: true
 });
 
-// Build a 'standalone' package that doesn't include emtr (so it must already be on the page).
+// Build a 'standalone' package that doesn't include emitr (so it must already be on the page).
 var noEmtrOut = path.join(libraryDir, "/target/single/"+moduleName+"-no-emitr.js");
 webbuild(libraryDir, {
 	out: noEmtrOut,
