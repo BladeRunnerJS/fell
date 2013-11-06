@@ -1,4 +1,4 @@
-// fell built for browser 2013-11-06T15:14:37.855Z
+// fell built for browser 2013-11-06T16:47:23.865Z
 ;(function (name, factory) {
 	if (typeof define === 'function') {
 		// A system that provides a define method that takes a name and a factory, e.g. AMD
@@ -291,7 +291,7 @@
 	_define("fell/lib/Log", function(require, exports, module) {
 		"use strict";
 		
-		var Emitter = require('emtr');
+		var Emitter = require('emitr');
 		var Logger = require('./Logger');
 		var Levels = require('./Levels');
 		

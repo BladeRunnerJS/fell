@@ -1,4 +1,4 @@
-// fell built for bundle module system 2013-11-06T15:14:37.855Z
+// fell built for bundle module system 2013-11-06T16:47:23.865Z
 define("fell", function(require, exports, module) {
 	module.exports = require("./lib/fell");
 });
@@ -189,7 +189,7 @@ define("fell/lib/Utils", function(require, exports, module) {
 define("fell/lib/Log", function(require, exports, module) {
 	"use strict";
 	
-	var Emitter = require('emtr');
+	var Emitter = require('emitr');
 	var Logger = require('./Logger');
 	var Levels = require('./Levels');
 	

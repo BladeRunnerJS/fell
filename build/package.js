@@ -18,7 +18,7 @@ var singleOut = path.join(libraryDir, "/target/single/"+moduleName+".js");
 fs.mkdirpSync(path.dirname(singleOut));
 webbuild(libraryDir, {
 	out: singleOut,
-	prefix: "// "+ moduleName + " built for browser " + now.toISOString() + "\n",
+	prefix: "// "+ moduleName + " built for browser standalone " + now.toISOString() + "\n",
 	includeSystem: true,
 	withDependencies: true
 });

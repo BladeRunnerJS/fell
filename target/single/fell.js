@@ -1,4 +1,4 @@
-// fell built for browser 2013-11-06T15:14:37.855Z
+// fell built for browser standalone 2013-11-06T16:47:23.865Z
 ;(function (name, factory) {
 	if (typeof define === 'function') {
 		// A system that provides a define method that takes a name and a factory, e.g. AMD
@@ -664,13 +664,13 @@
 		
 		module.exports = Logger;
 	});
-	_define("emtr", function(require, exports, module) {
+	_define("emitr", function(require, exports, module) {
 		module.exports = require("./lib/index");
 	});
 	_define("fell/lib/Log", function(require, exports, module) {
 		"use strict";
 		
-		var Emitter = require('emtr');
+		var Emitter = require('emitr');
 		var Logger = require('./Logger');
 		var Levels = require('./Levels');
 		
@@ -784,15 +784,14 @@
 		
 		module.exports = new Log();
 	});
-	_define("emtr/lib/index", function(require, exports, module) {
+	_define("emitr/lib/index", function(require, exports, module) {
 		module.exports = require('./Emitter');
 		module.exports.meta = require('./events');
 		module.exports.Event = require('./Event');
 	});
-	_define("emtr/lib/Emitter", function(require, exports, module) {
+	_define("emitr/lib/Emitter", function(require, exports, module) {
 		"use strict";
 		
-		var Emitter = null;
 		var slice = Array.prototype.slice;
 		
 		var metaEvents = require('./events');
@@ -835,7 +834,7 @@
 		 * Emitter provides event emitting capabilities, similar to Backbone.
 		 * For more information see <a href="http://caplin.github.io/Emitter">the project page</a>.
 		 */
-		Emitter = function Emitter() {
+		function Emitter() {
 			this._emitterListeners = new MultiMap();
 			this._emitterMetaEventsOn = false;
 		};
@@ -1059,7 +1058,91 @@
 		module.exports = Emitter;
 		
 	});
-	_define("emtr/lib/Event", function(require, exports, module) {
+	_define("emitr/lib/events", function(require, exports, module) {
+		"use strict";
+		
+		var Event = require('./Event');
+		
+		var MetaEvent = Event.extend(
+				/**
+				 * @memberOf Emitter.meta
+				 * @class MetaEvent
+				 * @param {*} event The event this MetaEvent is about
+				 * @classdesc
+				 * A parent class for all meta events.
+				 */
+						function(event) {
+					/**
+					 * Event provides the identifier of the event that this MetaEvent is about.
+					 * @name Emitter.meta.MetaEvent#event
+					 * @type {*}
+					 */
+					this.event = event;
+				}
+		);
+		/**
+		 * @memberOf Emitter.meta
+		 * @extends Emitter.meta.MetaEvent
+		 * @class ListenerEvent
+		 * @classdesc
+		 * A parent class for all MetaEvents about listeners.
+		 */
+		var ListenerEvent = MetaEvent.extend(
+				function(event, listener, context) {
+					MetaEvent.call(this, event);
+					/**
+					 * The listener this ListenerEvent is about.
+					 * @name Emitter.meta.ListenerEvent#listener
+					 * @type {function}
+					 */
+					this.listener = listener;
+					/**
+					 * The context associated with the listener.
+					 * @name Emitter.meta.ListenerEvent#context
+					 * @type {?object}
+					 */
+					this.context = context;
+				}
+		);
+		/**
+		 * @memberOf Emitter.meta
+		 * @class AddListenerEvent
+		 * @extends Emitter.meta.ListenerEvent
+		 */
+		var AddListenerEvent = ListenerEvent.extend();
+		/**
+		 * @memberOf Emitter.meta
+		 * @class RemoveListenerEvent
+		 * @extends Emitter.meta.ListenerEvent
+		 */
+		var RemoveListenerEvent = ListenerEvent.extend();
+		/**
+		 * @memberOf Emitter.meta
+		 * @class DeadEvent
+		 * @extends Emitter.meta.MetaEvent
+		 */
+		var DeadEvent = MetaEvent.extend(
+				function(event, args) {
+					MetaEvent.call(this, event);
+					this.data = args;
+				}
+		);
+		
+		/**
+		 * Where the meta events live.
+		 * @memberOf Emitter
+		 * @namespace meta
+		 */
+		module.exports = {
+			MetaEvent: MetaEvent,
+			ListenerEvent: ListenerEvent,
+			AddListenerEvent: AddListenerEvent,
+			RemoveListenerEvent: RemoveListenerEvent,
+			DeadEvent: DeadEvent
+		};
+		
+	});
+	_define("emitr/lib/Event", function(require, exports, module) {
 		"use strict";
 		
 		var shams = require('./shams');
@@ -1147,91 +1230,7 @@
 		
 		module.exports = Event;
 	});
-	_define("emtr/lib/events", function(require, exports, module) {
-		"use strict";
-		
-		var Event = require('./Event');
-		
-		var MetaEvent = Event.extend(
-				/**
-				 * @memberOf Emitter.meta
-				 * @class MetaEvent
-				 * @param {*} event The event this MetaEvent is about
-				 * @classdesc
-				 * A parent class for all meta events.
-				 */
-						function(event) {
-					/**
-					 * Event provides the identifier of the event that this MetaEvent is about.
-					 * @name Emitter.meta.MetaEvent#event
-					 * @type {*}
-					 */
-					this.event = event;
-				}
-		);
-		/**
-		 * @memberOf Emitter.meta
-		 * @extends Emitter.meta.MetaEvent
-		 * @class ListenerEvent
-		 * @classdesc
-		 * A parent class for all MetaEvents about listeners.
-		 */
-		var ListenerEvent = MetaEvent.extend(
-				function(event, listener, context) {
-					MetaEvent.call(this, event);
-					/**
-					 * The listener this ListenerEvent is about.
-					 * @name Emitter.meta.ListenerEvent#listener
-					 * @type {function}
-					 */
-					this.listener = listener;
-					/**
-					 * The context associated with the listener.
-					 * @name Emitter.meta.ListenerEvent#context
-					 * @type {?object}
-					 */
-					this.context = context;
-				}
-		);
-		/**
-		 * @memberOf Emitter.meta
-		 * @class AddListenerEvent
-		 * @extends Emitter.meta.ListenerEvent
-		 */
-		var AddListenerEvent = ListenerEvent.extend();
-		/**
-		 * @memberOf Emitter.meta
-		 * @class RemoveListenerEvent
-		 * @extends Emitter.meta.ListenerEvent
-		 */
-		var RemoveListenerEvent = ListenerEvent.extend();
-		/**
-		 * @memberOf Emitter.meta
-		 * @class DeadEvent
-		 * @extends Emitter.meta.MetaEvent
-		 */
-		var DeadEvent = MetaEvent.extend(
-				function(event, args) {
-					MetaEvent.call(this, event);
-					this.data = args;
-				}
-		);
-		
-		/**
-		 * Where the meta events live.
-		 * @memberOf Emitter
-		 * @namespace meta
-		 */
-		module.exports = {
-			MetaEvent: MetaEvent,
-			ListenerEvent: ListenerEvent,
-			AddListenerEvent: AddListenerEvent,
-			RemoveListenerEvent: RemoveListenerEvent,
-			DeadEvent: DeadEvent
-		};
-		
-	});
-	_define("emtr/lib/shams", function(require, exports, module) {
+	_define("emitr/lib/shams", function(require, exports, module) {
 		// Partial 'sham' to work around ie8s lack of es5 //////////////////////////////////////////////
 		// When IE8 support is no longer needed, all these can be dropped in favour of the es5 methods.
 		
@@ -1287,7 +1286,7 @@
 		
 		
 	});
-	_define("emtr/lib/MultiMap", function(require, exports, module) {
+	_define("emitr/lib/MultiMap", function(require, exports, module) {
 		var Map = require('./Map');
 		
 		function MultiMap() {
@@ -1359,7 +1358,7 @@
 		
 		module.exports = MultiMap;
 	});
-	_define("emtr/lib/Map", function(require, exports, module) {
+	_define("emitr/lib/Map", function(require, exports, module) {
 		"use strict";
 		
 		var global = Function("return this")();
