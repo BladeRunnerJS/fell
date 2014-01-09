@@ -1,2 +1,2 @@
-depends: browser-modules,emitr
+depends: bootstrap,emitr
 js: target/single/fell-no-emitr.js
