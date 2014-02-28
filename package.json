@@ -8,7 +8,7 @@
     "emitr": "0.0.x"
   },
   "devDependencies": {
-    "webbuilder": "git://github.com/BladeRunnerJS/webbuilder.git",
+    "webbuilder": "git://github.com/BladeRunnerJS/webbuilder.git#reorder-umd-header",
     "jsdoc3": "git://github.com/jsdoc3/jsdoc.git",
     "jshamcrest": "0.7.x",
     "jasmine-node": "1.11.x",
