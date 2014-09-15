@@ -160,7 +160,15 @@ describe('A Log object', function(){
 			assertThat(store, not(LogStore.contains(LogStore.event('warn'))));
 		});
 	});
+
 });
 
-
-
+describe('when no log store is configured', function() {
+	it('log functions work without throwing exceptions', function() {
+		var global = (function() {return this;})();
+		var fell = global.fell || require("..");
+		var Log = fell.Log;
+		Log.configure("info");
+		Log.info('hi');
+	});
+});
