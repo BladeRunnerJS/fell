@@ -1,4 +1,4 @@
-// fell built for browser standalone 2014-04-22T15:37:49.747Z
+// fell built for browser standalone 2014-09-15T13:51:02.836Z
 ;(function (name, factory) {
 	if (typeof module === 'object') {
 		// Does not work with strict CommonJS, but only CommonJS-like environments
