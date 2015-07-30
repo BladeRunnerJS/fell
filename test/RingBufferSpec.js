@@ -1,10 +1,9 @@
 'use strict';
 
+var RingBuffer = require('..').RingBuffer;
 var expect = require('expectations');
 
 describe('A RingBuffer ', function(){
-	var RingBuffer = global.fell ? global.fell.RingBuffer : require('..').RingBuffer;
-
 	it('should throw exceptions when constructed with invalid arguments.', function() {
 		expect(function() {
 			new RingBuffer();

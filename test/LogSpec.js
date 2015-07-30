@@ -1,7 +1,7 @@
 'use strict';
 /*global assertThat, not*/
 
-var fell = require('../src/fell');
+var fell = require('..');
 var JsHamcrest = require('jshamcrest').JsHamcrest;
 
 describe('A Log object', function(){

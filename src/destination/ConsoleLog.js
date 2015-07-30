@@ -3,7 +3,6 @@
 var Utils = require('../Utils');
 
 // If we're outputting to a node terminal, then use ANSI color codes to make the log output prettier.
-var global = Function('return this;')();
 var defaultFormatter = (global.process && global.process.stdout && Boolean(global.process.stdout.isTTY))
 		? Utils.ansiFormatter : Utils.templateFormatter;
 

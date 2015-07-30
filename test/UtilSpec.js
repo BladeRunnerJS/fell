@@ -1,10 +1,9 @@
 'use strict';
 
+var Util = require('..').Utils;
 var expect = require('expectations');
 
 describe('The Log Utility ', function() {
-	var Util = global.fell ? global.fell.Utils : require('..').Utils;
-
 	it('provides an interpolation function.', function() {
 		expect(Util.interpolate(''))
 				.toBe('');
