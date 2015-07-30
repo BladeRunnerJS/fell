@@ -1,8 +1,9 @@
-"use strict";
+'use strict';
 
 var Levels = require('./Levels');
 
-function NOOP() {};
+function NOOP() {
+}
 
 /**
  * Creates a Logger class specific to a component.

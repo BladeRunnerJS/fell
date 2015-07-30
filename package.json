@@ -14,13 +14,15 @@
   "main": "./src/fell.js",
   "scripts": {
     "prepublish": "browserify src/fell.js -s fell -o dist/fell.js",
-    "test": "npm run test:node && npm run test:browser && npm run test:saucelabs",
+    "test": "npm run test:lint && npm run test:node && npm run test:browser && npm run test:saucelabs",
+    "test:lint": "eslint src test",
     "test:node": "mocha test",
     "test:browser": "karma start",
     "test:saucelabs": "karma start karma-saucelabs.conf.js"
   },
   "devDependencies": {
     "browserify": "^11.0.1",
+    "eslint": "^0.24.1",
     "expectations": "^0.5.1",
     "jshamcrest": "~0.7.0",
     "karma": "^0.13.3",

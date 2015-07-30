@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var Utils = require('../Utils');
 var RingBuffer = require('../RingBuffer');
@@ -11,6 +11,10 @@ var RingBuffer = require('../RingBuffer');
  */
 function LogStore(maxRecords) {
 	this.logRecords = maxRecords ? new RingBuffer(maxRecords) : [];
+}
+
+function logRecordToString() {
+	return Utils.templateFormatter(this.time, this.component, this.level, this.data);
 }
 
 LogStore.prototype.onLog = function(time, component, level, data) {
@@ -35,12 +39,11 @@ LogStore.prototype.allMessages = function() {
 };
 
 LogStore.prototype.toString = function() {
-	return "Stored Log Messages:\n\t" + this.allMessages().join("\n\t");
+	return 'Stored Log Messages:\n\t' + this.allMessages().join('\n\t');
 };
 
-function logRecordToString() {
-	return Utils.templateFormatter(this.time, this.component, this.level, this.data);
-}
+// JsHamcrest globals:
+/*global allOf, anyOf, both, truth, hasMember*/
 
 LogStore.containsAll = function() {
 	var items = [];

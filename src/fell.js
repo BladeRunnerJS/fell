@@ -1,3 +1,5 @@
+'use strict';
+
 module.exports = {
 	Log: require('./Log'),
 	RingBuffer: require('./RingBuffer'),
@@ -7,7 +9,7 @@ module.exports = {
 	}
 };
 
-if (typeof console !== "undefined") {
+if (typeof console !== 'undefined') {
 	var ConsoleLogDestination = require('./destination/ConsoleLog');
 	module.exports.destination.ConsoleLog = new ConsoleLogDestination();
 }
