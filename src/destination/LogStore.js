@@ -42,57 +42,55 @@ function logRecordToString() {
 	return Utils.templateFormatter(this.time, this.component, this.level, this.data);
 }
 
-// JSHamcrest integration. /////////////////////////////////////////////////////////////////////////
+LogStore.containsAll = function() {
+	var items = [];
+	for (var i = 0; i < arguments.length; i++) {
+		items.push(LogStore.contains(arguments[i]));
+	}
+	return allOf(items);
+};
 
-var global = Function("return this")();
-if (global.both && global.hasMember && global.truth && global.allOf && global.anyOf) {
-	LogStore.containsAll = function() {
-		var items = [];
-		for (var i = 0; i < arguments.length; i++) {
-			items.push(LogStore.contains(arguments[i]));
-		}
-		return allOf(items);
-	};
-	LogStore.containsAny = function() {
-		var items = [];
-		for (var i = 0; i < arguments.length; i++) {
-			items.push(LogStore.contains(arguments[i]));
-		}
-		return anyOf(items);
-	};
-	LogStore.contains = function(matcher) {
-		var baseMatcher = truth();
-		baseMatcher.matches = function(actual) {
-			// Should be a LogStore
-			if (!(actual instanceof LogStore)) {
-				return false;
-			}
+LogStore.containsAny = function() {
+	var items = [];
+	for (var i = 0; i < arguments.length; i++) {
+		items.push(LogStore.contains(arguments[i]));
+	}
+	return anyOf(items);
+};
 
-			for (var i = 0; i < actual.logRecords.length; i++) {
-				if (matcher.matches(actual.logRecords[i])) {
-					return true;
-				}
-			}
+LogStore.contains = function(matcher) {
+	var baseMatcher = truth();
+	baseMatcher.matches = function(actual) {
+		// Should be a LogStore
+		if (!(actual instanceof LogStore)) {
 			return false;
-		};
-		baseMatcher.describeTo = function(description) {
-			description.append('there has been a log event ').appendDescriptionOf(matcher);
-		};
-		return baseMatcher;
+		}
+
+		for (var i = 0; i < actual.logRecords.length; i++) {
+			if (matcher.matches(actual.logRecords[i])) {
+				return true;
+			}
+		}
+		return false;
 	};
-	LogStore.event = function logEvent(level, component, data, time) {
-		var matcher = both(hasMember('level', level));
-		if (arguments.length > 1) {
-			matcher = matcher.and(hasMember('component', component));
-		}
-		if (arguments.length > 2) {
-			matcher = matcher.and(hasMember('data', data));
-		}
-		if (arguments.length > 3) {
-			matcher = matcher.and(hasMember('time', time));
-		}
-		return matcher;
+	baseMatcher.describeTo = function(description) {
+		description.append('there has been a log event ').appendDescriptionOf(matcher);
 	};
-}
+	return baseMatcher;
+};
+
+LogStore.event = function logEvent(level, component, data, time) {
+	var matcher = both(hasMember('level', level));
+	if (arguments.length > 1) {
+		matcher = matcher.and(hasMember('component', component));
+	}
+	if (arguments.length > 2) {
+		matcher = matcher.and(hasMember('data', data));
+	}
+	if (arguments.length > 3) {
+		matcher = matcher.and(hasMember('time', time));
+	}
+	return matcher;
+};
 
 module.exports = LogStore;
