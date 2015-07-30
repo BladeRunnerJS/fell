@@ -4,7 +4,8 @@ permalink: /index.html
 title: fell logging
 ---
 
-<script type="text/javascript" src="dist/single/fell.js"></script>
+<script type="text/javascript" src="https://github.com/BladeRunnerJS/emitr/blob/master/dist/emitr.js"></script>
+<script type="text/javascript" src="dist/fell.js"></script>
 
 fell
 ====
@@ -32,19 +33,14 @@ Aims
 Usage
 -----
 
-In a web browser, you'll want to include the js file <a href="dist/single/fell.js">fell.js</a>.
-
-If you are using the emitr dependency separately, you should include it first and use the
-<a href="dist/single/fell-no-emitr.js">fell-no-emitr.js</a> file instead.
-
-You can get the emitr dependency separately from [here](http://BladeRunnerJS.github.io/emitter).
+In a web browser, you'll need to include [emitr.js](https://github.com/BladeRunnerJS/emitr/blob/master/dist/emitr.js) and [fell.js](dist/fell.js).
 
 The following lines will pull the libraries from github. For a proper deployment, you should
 download them or check them out of github.
 
 ```
-   <script type="text/javascript" src="http://BladeRunnerJS.github.io/emitr/dist/single/emitr.js"></script>
-   <script type="text/javascript" src="http://BladeRunnerJS.github.io/fell/dist/single/fell-no-emitr.js"></script>
+   <script type="text/javascript" src="https://github.com/BladeRunnerJS/emitr/blob/master/dist/emitr.js"></script>
+   <script type="text/javascript" src="https://github.com/BladeRunnerJS/fell/blob/master/dist/fell.js"></script>
 ```
 
 In node, add fell to your package.json dependencies:
