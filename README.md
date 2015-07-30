@@ -1,9 +1,3 @@
----
-layout: main
-permalink: /index.html
-title: fell logging
----
-
 <script type="text/javascript" src="https://github.com/BladeRunnerJS/emitr/blob/master/dist/emitr.js"></script>
 <script type="text/javascript" src="dist/fell.js"></script>
 
@@ -13,10 +7,6 @@ fell
 A logging library that works in node and the browser.
 
 [![Build Status](https://travis-ci.org/BladeRunnerJS/fell.png)](https://travis-ci.org/BladeRunnerJS/fell)
-
-* This document is available nicely formatted [here](http://BladeRunnerJS.github.io/fell).
-* Tests are [here](http://BladeRunnerJS.github.io/fell/test).
-* Source code is [here](https://github.com/BladeRunnerJS/fell).
 
 The rendered form of this document includes the fell script so you can open
 a console and try it immediately.
