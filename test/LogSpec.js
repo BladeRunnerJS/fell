@@ -5,7 +5,18 @@ var fell = require('..');
 var JsHamcrest = require('jshamcrest').JsHamcrest;
 
 describe('A Log object', function(){
-	JsHamcrest.Integration.mocha();
+	// TODO: once JsHamCrest 0.7.1 becomes available with Mocha support (see
+	// <https://github.com/danielfm/jshamcrest/pull/22>) uncomment the line below and remove the assertThat() function
+	// JsHamcrest.Integration.mocha();
+	JsHamcrest.Integration.copyMembers(global);
+	global.assertThat = function(actual, matcher, message) {
+		return JsHamcrest.Operators.assert(actual, matcher, {
+			message: message,
+			fail: function(failMessage) {
+				throw failMessage;
+			}
+		});
+	};
 
 	var Log = fell.Log;
 	var LogStore = fell.destination.LogStore;
