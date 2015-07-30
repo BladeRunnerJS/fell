@@ -1,3 +1,5 @@
+require('expectations');
+
 describe('A RingBuffer ', function(){
 	var global = (function() {return this;})();
 	var RingBuffer = global.fell ? global.fell.RingBuffer : require("..").RingBuffer;

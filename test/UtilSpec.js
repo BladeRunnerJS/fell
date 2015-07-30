@@ -1,3 +1,5 @@
+require('expectations');
+
 describe('The Log Utility ', function() {
 	var global = (function() {return this;})();
 	var Util =  global.fell ? global.fell.Utils : require("..").Utils;

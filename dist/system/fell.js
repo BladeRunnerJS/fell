@@ -1,4 +1,4 @@
-// fell built for bundle module system 2015-07-30T07:19:15.983Z
+// fell built for bundle module system 2015-07-30T09:31:36.790Z
 define("fell", function(require, exports, module) {
 	module.exports = require("./src/fell");
 });

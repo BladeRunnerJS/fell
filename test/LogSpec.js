@@ -1,7 +1,9 @@
+require('expectations');
+
 describe('A Log object', function(){
 	var global = (function() {return this;})();
 	var JsHamcrest = global.JsHamcrest || require('jshamcrest').JsHamcrest;
-	JsHamcrest.Integration.jasmine();
+	JsHamcrest.Integration.mocha();
 
 	var fell = global.fell || require("..");
 	var Log = fell.Log;

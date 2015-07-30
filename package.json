@@ -14,18 +14,20 @@
   "main": "./src/fell.js",
   "scripts": {
     "prepublish": "node build/package.js",
-    "test": "jasmine-node --verbose test",
+    "test": "npm run test:node",
+    "test:node": "mocha test",
     "saucelabs-test": "grunt saucelabs-test"
   },
   "devDependencies": {
-    "webbuilder": "git://github.com/BladeRunnerJS/webbuilder.git",
-    "jshamcrest": "0.7.x",
-    "jasmine-node": "1.14.x",
+    "expectations": "^0.5.1",
     "fs-extra": "~0.6.3",
     "grunt": "0.4.x",
     "grunt-cli": "0.1.x",
-    "grunt-saucelabs": "8.3.x",
     "grunt-contrib-connect": "~0.1.2",
-    "grunt-contrib-watch": "~0.2.0"
+    "grunt-contrib-watch": "~0.2.0",
+    "grunt-saucelabs": "8.3.x",
+    "jshamcrest": "~0.7.0",
+    "mocha": "^2.2.5",
+    "webbuilder": "git://github.com/BladeRunnerJS/webbuilder.git"
   }
 }

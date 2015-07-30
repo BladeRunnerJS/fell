@@ -1,4 +1,4 @@
-// fell built for browser 2015-07-30T07:19:15.983Z
+// fell built for browser 2015-07-30T09:31:36.790Z
 ;(function (name, factory) {
 	if (typeof module === 'object') {
 		// Does not work with strict CommonJS, but only CommonJS-like environments
