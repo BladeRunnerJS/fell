@@ -1,4 +1,4 @@
-// fell built for browser 2015-07-29T15:31:55.020Z
+// fell built for browser 2015-07-30T07:19:15.983Z
 ;(function (name, factory) {
 	if (typeof module === 'object') {
 		// Does not work with strict CommonJS, but only CommonJS-like environments
@@ -97,9 +97,9 @@
 	var _define = defaultRealm.define;
 
 	_define("fell", function(require, exports, module) {
-		module.exports = require("./lib/fell");
+		module.exports = require("./src/fell");
 	});
-	_define("fell/lib/fell", function(require, exports, module) {
+	_define("fell/src/fell", function(require, exports, module) {
 		module.exports = {
 			Log: require('./Log'),
 			RingBuffer: require('./RingBuffer'),
@@ -114,7 +114,7 @@
 			module.exports.destination.ConsoleLog = new ConsoleLogDestination();
 		}
 	});
-	_define("fell/lib/Utils", function(require, exports, module) {
+	_define("fell/src/Utils", function(require, exports, module) {
 		"use strict";
 		
 		var DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -283,7 +283,7 @@
 			allowAll: allowAll
 		};
 	});
-	_define("fell/lib/Log", function(require, exports, module) {
+	_define("fell/src/Log", function(require, exports, module) {
 		"use strict";
 		
 		var Emitter = require('emitr');
@@ -400,7 +400,7 @@
 		
 		module.exports = new Log();
 	});
-	_define("fell/lib/RingBuffer", function(require, exports, module) {
+	_define("fell/src/RingBuffer", function(require, exports, module) {
 		"use strict";
 		
 		var Utils = require('./Utils');
@@ -579,7 +579,7 @@
 		
 		module.exports = RingBuffer;
 	});
-	_define("fell/lib/destination/LogStore", function(require, exports, module) {
+	_define("fell/src/destination/LogStore", function(require, exports, module) {
 		"use strict";
 		
 		var Utils = require('../Utils');
@@ -679,7 +679,7 @@
 		
 		module.exports = LogStore;
 	});
-	_define("fell/lib/destination/ConsoleLog", function(require, exports, module) {
+	_define("fell/src/destination/ConsoleLog", function(require, exports, module) {
 		"use strict";
 		
 		var Utils = require('../Utils');
@@ -722,11 +722,11 @@
 		
 		module.exports = ConsoleLogDestination;
 	});
-	_define("fell/lib/Levels", function(require, exports, module) {
+	_define("fell/src/Levels", function(require, exports, module) {
 		module.exports = ["fatal", "error", "warn", "info", "debug"];
 		
 	});
-	_define("fell/lib/Logger", function(require, exports, module) {
+	_define("fell/src/Logger", function(require, exports, module) {
 		"use strict";
 		
 		var Levels = require('./Levels');

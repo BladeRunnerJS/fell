@@ -1,5 +1,4 @@
 *.iml
 *.idea
-target/amd-simple/
 node_modules/
 sauce_connect.log*

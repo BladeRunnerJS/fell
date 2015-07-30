@@ -4,7 +4,7 @@ permalink: /index.html
 title: fell logging
 ---
 
-<script type="text/javascript" src="target/single/fell.js"></script>
+<script type="text/javascript" src="dist/single/fell.js"></script>
 
 fell
 ====
@@ -14,7 +14,7 @@ A logging library that works in node and the browser.
 [![Build Status](https://travis-ci.org/BladeRunnerJS/fell.png)](https://travis-ci.org/BladeRunnerJS/fell)
 
 * This document is available nicely formatted [here](http://BladeRunnerJS.github.io/fell).
-* Tests are [here](http://BladeRunnerJS.github.io/fell/spec).
+* Tests are [here](http://BladeRunnerJS.github.io/fell/test).
 * Source code is [here](https://github.com/BladeRunnerJS/fell).
 
 The rendered form of this document includes the fell script so you can open
@@ -32,10 +32,10 @@ Aims
 Usage
 -----
 
-In a web browser, you'll want to include the js file <a href="target/single/fell.js">fell.js</a>.
+In a web browser, you'll want to include the js file <a href="dist/single/fell.js">fell.js</a>.
 
 If you are using the emitr dependency separately, you should include it first and use the
-<a href="target/single/fell-no-emitr.js">fell-no-emitr.js</a> file instead.
+<a href="dist/single/fell-no-emitr.js">fell-no-emitr.js</a> file instead.
 
 You can get the emitr dependency separately from [here](http://BladeRunnerJS.github.io/emitter).
 
@@ -43,8 +43,8 @@ The following lines will pull the libraries from github. For a proper deployment
 download them or check them out of github.
 
 ```
-   <script type="text/javascript" src="http://BladeRunnerJS.github.io/emitr/target/single/emitr.js"></script>
-   <script type="text/javascript" src="http://BladeRunnerJS.github.io/fell/target/single/fell-no-emitr.js"></script>
+   <script type="text/javascript" src="http://BladeRunnerJS.github.io/emitr/dist/single/emitr.js"></script>
+   <script type="text/javascript" src="http://BladeRunnerJS.github.io/fell/dist/single/fell-no-emitr.js"></script>
 ```
 
 In node, add fell to your package.json dependencies:

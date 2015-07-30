@@ -14,7 +14,7 @@ var moduleName = require('../package.json').name || path.basename(libraryDir);
 fs.removeSync(path.join(libraryDir, 'target'));
 
 // Build a standalone package
-var singleOut = path.join(libraryDir, "/target/single/"+moduleName+".js");
+var singleOut = path.join(libraryDir, "/dist/single/"+moduleName+".js");
 fs.mkdirpSync(path.dirname(singleOut));
 webbuild(libraryDir, {
 	out: singleOut,
@@ -24,7 +24,7 @@ webbuild(libraryDir, {
 });
 
 // Build a 'standalone' package that doesn't include emitr (so it must already be on the page).
-var noEmtrOut = path.join(libraryDir, "/target/single/"+moduleName+"-no-emitr.js");
+var noEmtrOut = path.join(libraryDir, "/dist/single/"+moduleName+"-no-emitr.js");
 webbuild(libraryDir, {
 	out: noEmtrOut,
 	prefix: "// "+ moduleName + " built for browser " + now.toISOString() + "\n",
@@ -34,7 +34,7 @@ webbuild(libraryDir, {
 });
 
 // Build a bundle that expects there to already be a require/define
-var systemOut = path.join(libraryDir, "/target/system/"+moduleName+".js");
+var systemOut = path.join(libraryDir, "/dist/system/"+moduleName+".js");
 fs.mkdirpSync(path.dirname(systemOut));
 webbuild(libraryDir, {
 	out: systemOut,

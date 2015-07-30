@@ -1,8 +1,8 @@
-// fell built for bundle module system 2015-07-29T15:31:55.020Z
+// fell built for bundle module system 2015-07-30T07:19:15.983Z
 define("fell", function(require, exports, module) {
-	module.exports = require("./lib/fell");
+	module.exports = require("./src/fell");
 });
-define("fell/lib/fell", function(require, exports, module) {
+define("fell/src/fell", function(require, exports, module) {
 	module.exports = {
 		Log: require('./Log'),
 		RingBuffer: require('./RingBuffer'),
@@ -17,7 +17,7 @@ define("fell/lib/fell", function(require, exports, module) {
 		module.exports.destination.ConsoleLog = new ConsoleLogDestination();
 	}
 });
-define("fell/lib/Utils", function(require, exports, module) {
+define("fell/src/Utils", function(require, exports, module) {
 	"use strict";
 	
 	var DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -186,7 +186,7 @@ define("fell/lib/Utils", function(require, exports, module) {
 		allowAll: allowAll
 	};
 });
-define("fell/lib/Log", function(require, exports, module) {
+define("fell/src/Log", function(require, exports, module) {
 	"use strict";
 	
 	var Emitter = require('emitr');
@@ -303,7 +303,7 @@ define("fell/lib/Log", function(require, exports, module) {
 	
 	module.exports = new Log();
 });
-define("fell/lib/RingBuffer", function(require, exports, module) {
+define("fell/src/RingBuffer", function(require, exports, module) {
 	"use strict";
 	
 	var Utils = require('./Utils');
@@ -482,7 +482,7 @@ define("fell/lib/RingBuffer", function(require, exports, module) {
 	
 	module.exports = RingBuffer;
 });
-define("fell/lib/destination/LogStore", function(require, exports, module) {
+define("fell/src/destination/LogStore", function(require, exports, module) {
 	"use strict";
 	
 	var Utils = require('../Utils');
@@ -582,7 +582,7 @@ define("fell/lib/destination/LogStore", function(require, exports, module) {
 	
 	module.exports = LogStore;
 });
-define("fell/lib/destination/ConsoleLog", function(require, exports, module) {
+define("fell/src/destination/ConsoleLog", function(require, exports, module) {
 	"use strict";
 	
 	var Utils = require('../Utils');
@@ -625,11 +625,11 @@ define("fell/lib/destination/ConsoleLog", function(require, exports, module) {
 	
 	module.exports = ConsoleLogDestination;
 });
-define("fell/lib/Levels", function(require, exports, module) {
+define("fell/src/Levels", function(require, exports, module) {
 	module.exports = ["fatal", "error", "warn", "info", "debug"];
 	
 });
-define("fell/lib/Logger", function(require, exports, module) {
+define("fell/src/Logger", function(require, exports, module) {
 	"use strict";
 	
 	var Levels = require('./Levels');
