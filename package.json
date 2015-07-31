@@ -5,7 +5,7 @@
   "homepage": "http://BladeRunnerJS.github.io/fell",
   "license": "MIT",
   "dependencies": {
-    "emitr": "^0.0.5"
+    "emitr": "^0.0.6"
   },
   "repository": {
     "type": "git",

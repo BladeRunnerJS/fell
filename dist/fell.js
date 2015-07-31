@@ -375,10 +375,9 @@ Event.prototype.toString = function() {
 module.exports = Event;
 
 },{"./shams":7}],3:[function(require,module,exports){
+(function (global){
 /*eslint no-native-reassign:0*/
 'use strict';
-
-var global = Function('return this')();
 
 var Map = global.Map;
 
@@ -442,6 +441,7 @@ if (Map === undefined || Map.prototype.forEach === undefined) {
 
 module.exports = Map;
 
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],4:[function(require,module,exports){
 /*eslint no-native-reassign:0*/
 'use strict';
@@ -686,16 +686,18 @@ exports.create = function create(proto, descriptors) {
 };
 
 },{}],8:[function(require,module,exports){
-module.exports = ["fatal", "error", "warn", "info", "debug"];
+'use strict';
+
+module.exports = ['fatal', 'error', 'warn', 'info', 'debug'];
 
 },{}],9:[function(require,module,exports){
-"use strict";
+'use strict';
 
 var Emitter = require('emitr');
 var Logger = require('./Logger');
 var Levels = require('./Levels');
 
-var DEFAULT_COMPONENT = "[default]";
+var DEFAULT_COMPONENT = '[default]';
 
 function Log() {
 	this.loggers = null;
@@ -707,6 +709,23 @@ function Log() {
 Emitter.mixInto(Log);
 
 Log.prototype.DEFAULT_COMPONENT = DEFAULT_COMPONENT;
+
+function bestLevelMatch(config, key, otherwise) {
+	var candidates = Object.keys(config)
+			.filter(function(a) {
+				return a === key || key.substring(0, a.length + 1) === (a + '.');
+			}).sort(function(a, b) {
+				return b.length - a.length;
+			});
+	return candidates[0] ? config[candidates[0]] : otherwise;
+}
+
+function setLoggerLevels(defaultLevel, config, loggers) {
+	for (var loggerId in loggers) {
+		var level = bestLevelMatch(config, loggerId, defaultLevel);
+		loggers[loggerId]._setLevel(level);
+	}
+}
 
 Log.prototype.getLogger = function(component) {
 	if (arguments.length === 0) { component = DEFAULT_COMPONENT; }
@@ -724,7 +743,7 @@ Log.prototype.getLogger = function(component) {
 Log.prototype.configure = function(defaultLevel, config, destinations) {
 	if (arguments.length === 1 && typeof defaultLevel === 'object') {
 		config = arguments[0];
-		defaultLevel = "info";
+		defaultLevel = 'info';
 	}
 	config = config || {};
 	this.config = config;
@@ -733,7 +752,7 @@ Log.prototype.configure = function(defaultLevel, config, destinations) {
 	this.rootLogger = this.getLogger();
 
 	this.off();
-	if (! destinations && typeof console !== 'undefined') {
+	if (!destinations && typeof console !== 'undefined') {
 		var ConsoleLogDestination = require('./destination/ConsoleLog');
 		destinations = [new ConsoleLogDestination()];
 	}
@@ -772,7 +791,7 @@ Log.prototype.removeDestination = function(logDestination, context) {
 
 Log.prototype.clear = function() {
 	this.loggers = {};
-	this.configure("info");
+	this.configure('info');
 };
 
 Log.prototype.Levels = Levels;
@@ -786,30 +805,15 @@ Levels.forEach(function(level) {
 	};
 });
 
-function setLoggerLevels(defaultLevel, config, loggers) {
-	for (var loggerId in loggers) {
-		var level = bestLevelMatch(config, loggerId, defaultLevel);
-		loggers[loggerId]._setLevel(level);
-	}
-}
-
-function bestLevelMatch(config, key, otherwise) {
-	var candidates = Object.keys(config)
-			.filter(function(a) {
-				return a === key || key.substring(0, a.length + 1) === (a + ".");
-			}).sort(function(a, b) {
-				return b.length - a.length;
-			});
-	return candidates[0] ? config[candidates[0]] : otherwise;
-}
-
 module.exports = new Log();
+
 },{"./Levels":8,"./Logger":10,"./destination/ConsoleLog":13,"emitr":6}],10:[function(require,module,exports){
-"use strict";
+'use strict';
 
 var Levels = require('./Levels');
 
-function NOOP() {};
+function NOOP() {
+}
 
 /**
  * Creates a Logger class specific to a component.
@@ -853,8 +857,9 @@ Logger.prototype._setLevel = function(level) {
 };
 
 module.exports = Logger;
+
 },{"./Levels":8}],11:[function(require,module,exports){
-"use strict";
+'use strict';
 
 var Utils = require('./Utils');
 
@@ -871,10 +876,17 @@ function RingBuffer(size) {
 }
 
 var ERRORS = {
-	"parameter not function": "Parameter must be a function, was a {0}.",
-	"size less than 1": "RingBuffer cannot be created with a size less than 1 (was {0}).",
-	"size not integer": "RingBuffer cannot be created with a non integer size (was {0})."
+	'parameter not function': 'Parameter must be a function, was a {0}.',
+	'size less than 1': 'RingBuffer cannot be created with a size less than 1 (was {0}).',
+	'size not integer': 'RingBuffer cannot be created with a non integer size (was {0}).'
 };
+
+function errorMessage() {
+	var args = Array.prototype.slice.call(arguments);
+	args[0] = ERRORS[args[0]];
+	return Utils.interpolate.apply(Utils, args);
+}
+RingBuffer.errorMessage = errorMessage;
 
 /**
  * Clears all items from this RingBuffer and resets it.
@@ -917,7 +929,10 @@ RingBuffer.prototype.oldest = function () {
  *          items stored.
  */
 RingBuffer.prototype.get = function (n) {
-	if (n >= this.maxSize) return undefined;
+	if (n >= this.maxSize) {
+		return undefined;
+	}
+
 	if (this.isFull) {
 		return this.buffer[(this.next + n) % this.maxSize];
 	}
@@ -957,7 +972,7 @@ RingBuffer.prototype.push = function(object) {
 RingBuffer.prototype.setSize = function(newSize) {
 	this._checkSize(newSize);
 
-	if (this.maxSize == newSize) {
+	if (this.maxSize === newSize) {
 		return;
 	}
 	var tmpBuffer = new RingBuffer(newSize);
@@ -975,8 +990,8 @@ RingBuffer.prototype.setSize = function(newSize) {
  * @param {Function} func a function that will be called with each item.
  */
 RingBuffer.prototype.forEach = function (func) {
-	if (typeof func != 'function') {
-		throw new TypeError(errorMessage("parameter not function", typeof func));
+	if (typeof func !== 'function') {
+		throw new TypeError(errorMessage('parameter not function', typeof func));
 	}
 
 	for (var i = 0, end = this.getSize(); i < end; ++i) {
@@ -997,45 +1012,57 @@ RingBuffer.prototype.getSize = function () {
  *          human readable for debugging but may change.
  */
 RingBuffer.prototype.toString = function () {
-	var result = [ "{sidingwindow start=" ];
+	var result = [ '{sidingwindow start=' ];
 	result.push(this.next);
-	result.push(" values=[");
-	result.push(this.buffer.join(","));
-	result.push("] }");
+	result.push(' values=[');
+	result.push(this.buffer.join(','));
+	result.push('] }');
 
-	return result.join("");
+	return result.join('');
 };
 
 RingBuffer.prototype._checkSize = function(size) {
-	if (size !== (size|0)) {
-		throw new Error(errorMessage("size not integer", size));
+	if (size !== (size | 0)) {
+		throw new Error(errorMessage('size not integer', size));
 	}
 	if (size < 1) {
-		throw new Error(errorMessage("size less than 1", size));
+		throw new Error(errorMessage('size less than 1', size));
 	}
 };
 
 RingBuffer.prototype._changeWindow = function(incoming) {
 	this.buffer[this.next] = incoming;
 	this.next = (this.next + 1) % this.maxSize;
-	if (this.next == 0) {
+	if (this.next === 0) {
 		this.isFull = true;
 	}
 };
 
-function errorMessage() {
-	var args = Array.prototype.slice.call(arguments);
-	args[0] = ERRORS[args[0]];
-	return Utils.interpolate.apply(Utils, args);
-}
-RingBuffer.errorMessage = errorMessage;
-
 module.exports = RingBuffer;
-},{"./Utils":12}],12:[function(require,module,exports){
-"use strict";
 
-var DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-var MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+},{"./Utils":12}],12:[function(require,module,exports){
+'use strict';
+
+var DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+var MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+function padAfter(val, length, paddingCharacter) {
+	val = String(val);
+	if (val.length >= length) {
+		return val;
+	}
+	var result = val + (new Array(length).join(paddingCharacter) + paddingCharacter);
+	return result.substring(0, length);
+}
+
+function padBefore(val, length, paddingCharacter) {
+	val = String(val);
+	if (val.length >= length) {
+		return val;
+	}
+	var result = (new Array(length).join(paddingCharacter) + paddingCharacter) + val;
+	return result.substring(result.length - length);
+}
 
 /**
  * Formats a date according to a provided pattern.  The pattern is intended to be compatible with
@@ -1057,38 +1084,24 @@ function format(pattern, date) {
 	var fullYear = date.getFullYear();
 
 	return pattern
-			.replace(/HH/g, padBefore(hour, 2, "0"))
+			.replace(/HH/g, padBefore(hour, 2, '0'))
 			.replace(/H/g, hour)
-			.replace(/mm/g, padBefore(minute, 2, "0"))
+			.replace(/mm/g, padBefore(minute, 2, '0'))
 			.replace(/m/g, minute)
-			.replace(/ss/g, padBefore(sec, 2, "0"))
+			.replace(/ss/g, padBefore(sec, 2, '0'))
 			.replace(/s/g, sec)
-			.replace(/SSS/g, padBefore(millis, 3, "0"))
+			.replace(/SSS/g, padBefore(millis, 3, '0'))
 			.replace(/S/g, millis)
 			.replace(/yyyy/g, fullYear)
 			.replace(/yy/g, String(fullYear).substring(2))
-			.replace(/dd/g, padBefore(dateNo, 2, "0"))
+			.replace(/dd/g, padBefore(dateNo, 2, '0'))
 			.replace(/d/g, dateNo)
 			.replace(/MMMM/g, MONTH_NAMES[month])
 			.replace(/MMM/g, MONTH_NAMES[month].substring(0, 3))
-			.replace(/MM/g, padBefore(month + 1, 2, "0"))
+			.replace(/MM/g, padBefore(month + 1, 2, '0'))
 			.replace(/M/g, month + 1)
 			.replace(/EEEE/g, DAY_NAMES[dayNo])
 			.replace(/EEE/g, DAY_NAMES[dayNo].substring(0, 3));
-}
-
-function padAfter(val, length, paddingCharacter) {
-	val = String(val);
-	if (val.length >= length) return val;
-	var result = val + (new Array(length).join(paddingCharacter) + paddingCharacter);
-	return result.substring(0, length);
-}
-
-function padBefore(val, length, paddingCharacter) {
-	val = String(val);
-	if (val.length >= length) return val;
-	var result = (new Array(length).join(paddingCharacter) + paddingCharacter) + val;
-	return result.substring(result.length - length);
 }
 
 /**
@@ -1121,12 +1134,12 @@ function interpolate(template) {
  */
 function templateFormatter(time, component, level, data) {
 	var date = new Date(time);
-	return format("yyyy-MM-dd HH:mm:ss.SSS", date)
-			+ " ["
-			+ padAfter(level, 5, " ")
-			+ "] ["
-			+ padAfter(component, 18, " ")
-			+ "] : "
+	return format('yyyy-MM-dd HH:mm:ss.SSS', date)
+			+ ' ['
+			+ padAfter(level, 5, ' ')
+			+ '] ['
+			+ padAfter(component, 18, ' ')
+			+ '] : '
 			+ interpolate.apply(null, data);
 }
 
@@ -1136,32 +1149,32 @@ var colors = {
 	black: 0, red: 1, green: 2, yellow: 3, blue: 4, magenta: 5, cyan: 6, white: 7
 };
 
-function style(str, style) {
+function style(str, styleObj) {
 	var startCodes = [];
 	var endCodes = [];
-	for (var key in style) {
+	for (var key in styleObj) {
 		if (key === 'color' || key === 'background') {
 			var base = (key === 'color' ? 30 : 40);
-			var styleParts = style[key].split(" ");
+			var styleParts = styleObj[key].split(' ');
 			var color = styleParts[styleParts.length - 1];
 			var isBright = false;
 			if (styleParts[0] === 'bright') {
 				isBright = true;
 			}
-			startCodes.push("\x1B[" + (base + colors[color]) + (isBright ? ";1m" : "m"));
-			endCodes.push("\x1B[" + (base + 9) + (isBright ? ";22m" : "m"))
+			startCodes.push('\x1B[' + (base + colors[color]) + (isBright ? ';1m' : 'm'));
+			endCodes.push('\x1B[' + (base + 9) + (isBright ? ';22m' : 'm'));
 		}
 		// maybe add some of the other ansi styles in future.
 	}
-	return startCodes.join("") + str + endCodes.reverse().join("");
+	return startCodes.join('') + str + endCodes.reverse().join('');
 }
 
 var LEVEL_STYLES = {
-	"fatal": {color: "bright white", background: "bright red"},
-	"error": {color: "bright red"},
-	"warn": {color: "bright yellow"},
-	"info": {},
-	"debug": {color: "green"}
+	'fatal': {color: 'bright white', background: 'bright red'},
+	'error': {color: 'bright red'},
+	'warn': {color: 'bright yellow'},
+	'info': {},
+	'debug': {color: 'green'}
 };
 
 /**
@@ -1174,10 +1187,10 @@ var LEVEL_STYLES = {
  */
 function ansiFormatter(time, component, level, data) {
 	var date = new Date(time);
-	return style(format("yyyy-MM-dd HH:mm:ss.SSS", date)
-				+ " [" + padAfter(level, 5, " ")	+ "] ["
-				+ padAfter(component, 18, " ") + "]", LEVEL_STYLES[level])
-			+ " : " + interpolate.apply(null, data);
+	return style(format('yyyy-MM-dd HH:mm:ss.SSS', date)
+				+ ' [' + padAfter(level, 5, ' ')	+ '] ['
+				+ padAfter(component, 18, ' ') + ']', LEVEL_STYLES[level])
+			+ ' : ' + interpolate.apply(null, data);
 }
 
 /**
@@ -1188,7 +1201,7 @@ function ansiFormatter(time, component, level, data) {
  * @param data
  * @returns {boolean}
  */
-function allowAll(time, component, level, data) {
+function allowAll() {
 	return true;
 }
 
@@ -1199,23 +1212,24 @@ module.exports = {
 	ansiFormatter: ansiFormatter,
 	allowAll: allowAll
 };
+
 },{}],13:[function(require,module,exports){
-"use strict";
+(function (global){
+'use strict';
 
 var Utils = require('../Utils');
 
 // If we're outputting to a node terminal, then use ANSI color codes to make the log output prettier.
-var global = Function("return this;")();
 var defaultFormatter = (global.process && global.process.stdout && Boolean(global.process.stdout.isTTY))
 		? Utils.ansiFormatter : Utils.templateFormatter;
 
 // Browsers provide different visual display for different log levels.
 var CONSOLE_OUTPUT = {
-	"fatal": console.error,
-	"error": console.error,
-	"warn": console.warn,
-	"info": console.info,
-	"debug": console.debug || console.log
+	'fatal': console.error,
+	'error': console.error,
+	'warn': console.warn,
+	'info': console.info,
+	'debug': console.debug || console.log
 };
 
 /**
@@ -1228,7 +1242,7 @@ var CONSOLE_OUTPUT = {
 function ConsoleLogDestination(filter, formatter) {
 	this.filter = filter || Utils.allowAll;
 	this.formatter = formatter || defaultFormatter;
-};
+}
 
 ConsoleLogDestination.prototype.onLog = function(time, component, level, data) {
 	if (this.filter(time, component, level, data)) {
@@ -1241,8 +1255,10 @@ ConsoleLogDestination.prototype.output = function(level, message) {
 };
 
 module.exports = ConsoleLogDestination;
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"../Utils":12}],14:[function(require,module,exports){
-"use strict";
+'use strict';
 
 var Utils = require('../Utils');
 var RingBuffer = require('../RingBuffer');
@@ -1255,6 +1271,10 @@ var RingBuffer = require('../RingBuffer');
  */
 function LogStore(maxRecords) {
 	this.logRecords = maxRecords ? new RingBuffer(maxRecords) : [];
+}
+
+function logRecordToString() {
+	return Utils.templateFormatter(this.time, this.component, this.level, this.data);
 }
 
 LogStore.prototype.onLog = function(time, component, level, data) {
@@ -1279,68 +1299,68 @@ LogStore.prototype.allMessages = function() {
 };
 
 LogStore.prototype.toString = function() {
-	return "Stored Log Messages:\n\t" + this.allMessages().join("\n\t");
+	return 'Stored Log Messages:\n\t' + this.allMessages().join('\n\t');
 };
 
-function logRecordToString() {
-	return Utils.templateFormatter(this.time, this.component, this.level, this.data);
-}
+// JsHamcrest globals:
+/*global allOf, anyOf, both, truth, hasMember*/
 
-// JSHamcrest integration. /////////////////////////////////////////////////////////////////////////
+LogStore.containsAll = function() {
+	var items = [];
+	for (var i = 0; i < arguments.length; i++) {
+		items.push(LogStore.contains(arguments[i]));
+	}
+	return allOf(items);
+};
 
-var global = Function("return this")();
-if (global.both && global.hasMember && global.truth && global.allOf && global.anyOf) {
-	LogStore.containsAll = function() {
-		var items = [];
-		for (var i = 0; i < arguments.length; i++) {
-			items.push(LogStore.contains(arguments[i]));
-		}
-		return allOf(items);
-	};
-	LogStore.containsAny = function() {
-		var items = [];
-		for (var i = 0; i < arguments.length; i++) {
-			items.push(LogStore.contains(arguments[i]));
-		}
-		return anyOf(items);
-	};
-	LogStore.contains = function(matcher) {
-		var baseMatcher = truth();
-		baseMatcher.matches = function(actual) {
-			// Should be a LogStore
-			if (!(actual instanceof LogStore)) {
-				return false;
-			}
+LogStore.containsAny = function() {
+	var items = [];
+	for (var i = 0; i < arguments.length; i++) {
+		items.push(LogStore.contains(arguments[i]));
+	}
+	return anyOf(items);
+};
 
-			for (var i = 0; i < actual.logRecords.length; i++) {
-				if (matcher.matches(actual.logRecords[i])) {
-					return true;
-				}
-			}
+LogStore.contains = function(matcher) {
+	var baseMatcher = truth();
+	baseMatcher.matches = function(actual) {
+		// Should be a LogStore
+		if (!(actual instanceof LogStore)) {
 			return false;
-		};
-		baseMatcher.describeTo = function(description) {
-			description.append('there has been a log event ').appendDescriptionOf(matcher);
-		};
-		return baseMatcher;
+		}
+
+		for (var i = 0; i < actual.logRecords.length; i++) {
+			if (matcher.matches(actual.logRecords[i])) {
+				return true;
+			}
+		}
+		return false;
 	};
-	LogStore.event = function logEvent(level, component, data, time) {
-		var matcher = both(hasMember('level', level));
-		if (arguments.length > 1) {
-			matcher = matcher.and(hasMember('component', component));
-		}
-		if (arguments.length > 2) {
-			matcher = matcher.and(hasMember('data', data));
-		}
-		if (arguments.length > 3) {
-			matcher = matcher.and(hasMember('time', time));
-		}
-		return matcher;
+	baseMatcher.describeTo = function(description) {
+		description.append('there has been a log event ').appendDescriptionOf(matcher);
 	};
-}
+	return baseMatcher;
+};
+
+LogStore.event = function logEvent(level, component, data, time) {
+	var matcher = both(hasMember('level', level));
+	if (arguments.length > 1) {
+		matcher = matcher.and(hasMember('component', component));
+	}
+	if (arguments.length > 2) {
+		matcher = matcher.and(hasMember('data', data));
+	}
+	if (arguments.length > 3) {
+		matcher = matcher.and(hasMember('time', time));
+	}
+	return matcher;
+};
 
 module.exports = LogStore;
+
 },{"../RingBuffer":11,"../Utils":12}],15:[function(require,module,exports){
+'use strict';
+
 module.exports = {
 	Log: require('./Log'),
 	RingBuffer: require('./RingBuffer'),
@@ -1350,9 +1370,10 @@ module.exports = {
 	}
 };
 
-if (typeof console !== "undefined") {
+if (typeof console !== 'undefined') {
 	var ConsoleLogDestination = require('./destination/ConsoleLog');
 	module.exports.destination.ConsoleLog = new ConsoleLogDestination();
 }
+
 },{"./Log":9,"./RingBuffer":11,"./Utils":12,"./destination/ConsoleLog":13,"./destination/LogStore":14}]},{},[15])(15)
 });
