@@ -1,6 +1,6 @@
 {
   "name": "fell",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "A simple javascript logging framework.",
   "homepage": "http://BladeRunnerJS.github.io/fell",
   "license": "MIT",
