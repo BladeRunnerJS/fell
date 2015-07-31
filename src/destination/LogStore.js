@@ -17,7 +17,7 @@ function logRecordToString() {
 	return Utils.templateFormatter(this.time, this.component, this.level, this.data);
 }
 
-LogStore.prototype.onLog = function(time, component, level, data) {
+LogStore.prototype.onLog = function(component, level, data, time) {
 	this.logRecords.push({
 		time: time,
 		component: component,

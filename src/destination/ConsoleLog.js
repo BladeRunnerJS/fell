@@ -27,7 +27,7 @@ function ConsoleLogDestination(filter, formatter) {
 	this.formatter = formatter || defaultFormatter;
 }
 
-ConsoleLogDestination.prototype.onLog = function(time, component, level, data) {
+ConsoleLogDestination.prototype.onLog = function(component, level, data, time) {
 	if (this.filter(time, component, level, data)) {
 		this.output(level, this.formatter(time, component, level, data));
 	}
