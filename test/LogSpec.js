@@ -1,131 +1,129 @@
 'use strict';
-/*global assertThat, not*/
 
-var fell = require('..');
-var JsHamcrest = require('jshamcrest').JsHamcrest;
+var Log = require('../src/Log');
+var sinon = require('sinon');
 
-describe('A Log object', function(){
-	// TODO: once JsHamCrest 0.7.1 becomes available with Mocha support (see
-	// <https://github.com/danielfm/jshamcrest/pull/22>) uncomment the line below and remove the assertThat() function
-	// JsHamcrest.Integration.mocha();
-	JsHamcrest.Integration.copyMembers(global);
-	global.assertThat = function(actual, matcher, message) {
-		return JsHamcrest.Operators.assert(actual, matcher, {
-			message: message,
-			fail: function(failMessage) {
-				throw failMessage;
-			}
-		});
-	};
-
-	var Log = fell.Log;
-	var LogStore = fell.destination.LogStore;
-
-	var store;
+describe('Log class', function() {
+	var log, mockStore, store;
 
 	beforeEach(function() {
-		store = new LogStore();
+		log = new Log();
+		mockStore = sinon.mock({onLog:function(){}});
+		store = mockStore.object;
+		mockStore.expects('onLog').withArgs('no-such-args').never(); // fake expectation so we can register the store early
+	});
+
+	afterEach(function() {
+		mockStore.verify();
+	});
+
+	function args() {
+		return arguments;
+	}
+
+	it('can be used without throwing exceptions even if the log store has not been configured', function() {
+		log.configure('info');
+		log.info('hi');
 	});
 
 	describe('when newly created, and configured with level info', function() {
 		beforeEach(function() {
-			Log.configure('info', {}, [store]);
+			log.configure('info', {}, [store]);
+		});
+
+		it('makes all pertinent information available', function() {
+			mockStore.expects('onLog').withArgs(log.DEFAULT_COMPONENT, 'info', args('logging message at level {0}', '@info')).once();
+			log.info('logging message at level {0}', '@info');
 		});
 
 		it('does not output debug level messages.', function() {
-			Log.Levels.forEach(function(level) {
-				Log[level]('logging message at level {0}', level);
+			mockStore.expects('onLog').withArgs(sinon.match.any, 'fatal').once();
+			mockStore.expects('onLog').withArgs(sinon.match.any, 'error').once();
+			mockStore.expects('onLog').withArgs(sinon.match.any, 'warn').once();
+			mockStore.expects('onLog').withArgs(sinon.match.any, 'info').once();
+			mockStore.expects('onLog').withArgs(sinon.match.any, 'debug').never();
+
+			log.Levels.forEach(function(level) {
+				log[level]('some message');
 			});
-
-			assertThat(store, LogStore.containsAll(
-					LogStore.event('fatal', Log.DEFAULT_COMPONENT, ['logging message at level {0}', 'fatal']),
-					LogStore.event('error', Log.DEFAULT_COMPONENT, ['logging message at level {0}', 'error']),
-					LogStore.event('warn', Log.DEFAULT_COMPONENT, ['logging message at level {0}', 'warn']),
-					LogStore.event('info', Log.DEFAULT_COMPONENT, ['logging message at level {0}', 'info'])
-			));
-
-			assertThat(store, not(LogStore.contains(LogStore.event('debug'))));
 		});
 
 		describe('and the level is changed to error,', function() {
+			beforeEach(function() {
+				log.changeLevel('error');
+			});
+
 			it('then only error and fatal messages are logged.', function() {
-				Log.changeLevel('error');
+				mockStore.expects('onLog').withArgs(sinon.match.any, 'fatal').once();
+				mockStore.expects('onLog').withArgs(sinon.match.any, 'error').once();
+				mockStore.expects('onLog').withArgs(sinon.match.any, 'warn').never();
+				mockStore.expects('onLog').withArgs(sinon.match.any, 'info').never();
+				mockStore.expects('onLog').withArgs(sinon.match.any, 'debug').never();
 
-				Log.Levels.forEach(function(level) {
-					Log[level]('logging message at level {0}', level);
+				log.Levels.forEach(function(level) {
+					log[level]('some message');
 				});
-
-				assertThat(store, LogStore.containsAll(
-						LogStore.event('fatal'),
-						LogStore.event('error')
-				));
-
-				assertThat(store, not(LogStore.containsAny(
-						LogStore.event('info'),
-						LogStore.event('warn'),
-						LogStore.event('debug')
-				)));
 			});
 
 			it('when the level is changed back, then the right messages are logged.', function() {
-				Log.changeLevel('info');
+				log.changeLevel('info');
 
-				Log.Levels.forEach(function(level) {
-					Log[level]('logging message at level {0}', level);
+				mockStore.expects('onLog').withArgs(sinon.match.any, 'fatal').once();
+				mockStore.expects('onLog').withArgs(sinon.match.any, 'error').once();
+				mockStore.expects('onLog').withArgs(sinon.match.any, 'warn').once();
+				mockStore.expects('onLog').withArgs(sinon.match.any, 'info').once();
+				mockStore.expects('onLog').withArgs(sinon.match.any, 'debug').never();
+
+				log.Levels.forEach(function(level) {
+					log[level]('some message');
 				});
-
-				assertThat(store, LogStore.containsAll(
-						LogStore.event('fatal', Log.DEFAULT_COMPONENT, ['logging message at level {0}', 'fatal']),
-						LogStore.event('error', Log.DEFAULT_COMPONENT, ['logging message at level {0}', 'error']),
-						LogStore.event('warn', Log.DEFAULT_COMPONENT, ['logging message at level {0}', 'warn']),
-						LogStore.event('info', Log.DEFAULT_COMPONENT, ['logging message at level {0}', 'info'])
-				));
-
-				assertThat(store, not(LogStore.contains(LogStore.event('debug'))));
 			});
 		});
 
 		it('will provide a logger for a particular component configured to the same log level.', function() {
-			var log = Log.getLogger('test');
-			log.warn('hello at warn level');
-			log.debug('hello at debug level (should not be logged).');
+			mockStore.expects('onLog').withArgs(sinon.match.any, 'warn', args('hello at warn level')).once();
+			mockStore.expects('onLog').withArgs(sinon.match.any, 'debug').never();
 
-			assertThat(store, LogStore.contains(
-					LogStore.event('warn', 'test')
-			));
-			assertThat(store, not(LogStore.contains(LogStore.event('debug'))));
+			var logger = log.getLogger('test');
+			logger.warn('hello at warn level');
+			logger.debug('hello at debug level (should not be logged).');
 		});
 
 		describe('when a second destination is added', function() {
-			var newStore;
+			var mockStore2, store2;
+
 			beforeEach(function() {
-				newStore = new LogStore();
-				Log.addDestination(newStore);
+				mockStore2 = sinon.mock({onLog:function(){}});
+				store2 = mockStore2.object;
+				mockStore2.expects('onLog').withArgs('no-such-args').never(); // fake expectation so we can register the store early
+				log.addDestination(store2);
+			});
+
+			afterEach(function() {
+				mockStore2.verify();
 			});
 
 			it('then it should log to both.', function() {
-				Log.warn('Hello');
+				mockStore.expects('onLog').withArgs(sinon.match.any, 'warn', args('Hello')).once();
+				mockStore2.expects('onLog').withArgs(sinon.match.any, 'warn', args('Hello')).once();
 
-				var aDefaultWarnHelloLogEvent = LogStore.contains(LogStore.event('warn', Log.DEFAULT_COMPONENT, ['Hello']));
-				assertThat(newStore, aDefaultWarnHelloLogEvent);
-				assertThat(store, aDefaultWarnHelloLogEvent);
+				log.warn('Hello');
 			});
 
 			it('and then the first is removed, it should only log to the new one.', function() {
-				Log.removeDestination(store);
+				log.removeDestination(store);
 
-				Log.warn('Hello');
+				mockStore.expects('onLog').withArgs(sinon.match.any, 'warn', args('Hello')).never();
+				mockStore2.expects('onLog').withArgs(sinon.match.any, 'warn', args('Hello')).once();
 
-				var aDefaultWarnHelloLogEvent = LogStore.contains(LogStore.event('warn', Log.DEFAULT_COMPONENT, ['Hello']));
-				assertThat(store, not(aDefaultWarnHelloLogEvent));
-				assertThat(newStore, aDefaultWarnHelloLogEvent);
+				log.warn('Hello');
 			});
 		});
 	});
 
 	describe('when configured with some components', function() {
 		beforeEach(function() {
-			Log.configure('error', {
+			log.configure('error', {
 				'first.second.third': 'info',
 				'first': 'fatal',
 				'other.second': 'debug'
@@ -133,54 +131,37 @@ describe('A Log object', function(){
 		});
 
 		it('and a logger is requested for a child of a configured component, should provide a logger with the correct level set.', function() {
-			var log = Log.getLogger('first.second.third.fourth');
-			log.info('hi');
-			log.debug('hi');
+			mockStore.expects('onLog').withArgs('first.second.third.fourth', 'info', args('hi')).once();
+			mockStore.expects('onLog').withArgs(sinon.match.any, 'debug').never();
 
-			assertThat(store, LogStore.contains(
-					LogStore.event('info', 'first.second.third.fourth')
-			));
-			assertThat(store, not(LogStore.contains(LogStore.event('debug'))));
+			var logger = log.getLogger('first.second.third.fourth');
+			logger.info('hi');
+			logger.debug('hi');
 		});
 
 		it('and a logger is requested for a configured component, should provide a logger with the correct level set.', function() {
-			var log = Log.getLogger('other.second');
-			log.debug('hi');
+			mockStore.expects('onLog').withArgs('other.second', 'debug', args('hi')).once();
 
-			assertThat(store, LogStore.contains(
-					LogStore.event('debug', 'other.second')
-			));
+			var logger = log.getLogger('other.second');
+			logger.debug('hi');
 		});
 
 		it('and a logger is requested for a component in between configurations, should provide a logger with the correct level set.', function() {
-			var log = Log.getLogger('first.second');
-			log.error('hi');
-			log.fatal('hi');
+			mockStore.expects('onLog').withArgs('first.second', 'fatal', args('hi')).once();
+			mockStore.expects('onLog').withArgs(sinon.match.any, 'error').never();
 
-			assertThat(store, LogStore.contains(
-					LogStore.event('fatal', 'first.second')
-			));
-			assertThat(store, not(LogStore.contains(LogStore.event('error'))));
+			var logger = log.getLogger('first.second');
+			logger.error('hi');
+			logger.fatal('hi');
 		});
 
 		it('and a logger is requested for a component that doesn\'t match a configuration, should provide a logger with the correct default level.', function() {
-			var log = Log.getLogger('firsty');
-			log.error('hi');
-			log.warn('hi');
+			mockStore.expects('onLog').withArgs('firsty', 'error', args('hi')).once();
+			mockStore.expects('onLog').withArgs(sinon.match.any, 'warn').never();
 
-			assertThat(store, LogStore.contains(
-					LogStore.event('error', 'firsty')
-			));
-			assertThat(store, not(LogStore.contains(LogStore.event('warn'))));
+			var logger = log.getLogger('firsty');
+			logger.error('hi');
+			logger.warn('hi');
 		});
-	});
-
-});
-
-describe('when no log store is configured', function() {
-	it('log functions work without throwing exceptions', function() {
-		var Log = fell.Log;
-		Log.configure('info');
-		Log.info('hi');
 	});
 });

@@ -112,4 +112,4 @@ Levels.forEach(function(level) {
 	};
 });
 
-module.exports = new Log();
+module.exports = Log;

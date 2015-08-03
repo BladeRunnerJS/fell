@@ -1,7 +1,9 @@
 'use strict';
 
+var Log = require('./Log');
+
 module.exports = {
-	Log: require('./Log'),
+	Log: new Log(),
 	RingBuffer: require('./RingBuffer'),
 	Utils: require('./Utils'),
 	destination: {
