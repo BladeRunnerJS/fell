@@ -134,90 +134,57 @@ If you want to modify the logging while in use you can use methods specifically 
 Testing
 -------
 
-Care must be taken when testing for log messages in order to avoid writing fragile tests.
+Care must be taken when testing for log messages in order to avoid writing fragile tests. To help with this, we recommend the use of a mocking library like [JsMockito](http://jsmockito.org/).
 
-In order to help with this, the provided LogStore destination detects when it's loaded with [JsHamcrest](http://danielfm.github.io/jshamcrest)
-integrated, and provides a number of jshamcrest matchers to be used when unit testing.
-
-Here's an example of usage:
+Here's an example of some logging code that you might want to test:
 
 ```javascript
 
-    // code under test
-    var Log = typeof fell !== 'undefined' ? fell.Log : require('fell').Log;
+    var Log = require('fell').Log;
 
     function MyObject(parameter) {
-    	this.log = Log.getLogger('mymodule.MyObject');
-
-    	this.info(MyObject.LOG_MESSAGES['initialising'], MyObject.version, parameter);
+      this.log = Log.getLogger('mymodule.MyObject');
+      this.log.info(MyObject.LOG_MESSAGES.INITIALISING, MyObject.version, parameter);
     }
 
     MyObject.LOG_MESSAGES = {
-    	'initialising': 'Initialising MyObject, version {0}, with parameter {1}.'
+      INITIALISING: 'Initialising MyObject, version {0}, with parameter {1}.'
     }
 
-    MyObject.version = "1.2.3";
+    MyObject.version = '1.2.3';
 
+    module.exports = MyObject;
+```
 
+and the corresponding test code to verify it:
 
-    // test code
+```javascript
 
-    // Note:  This will only work if JsHamcrest.Integration.jasmine() was run
-    // sometime before the LogStore was defined.
+    var MyObject = require('..');
+    var Log = require('fell').Log;
+    var JsMockito = require('jsmockito').JsMockito;
+    var JsHamcrest = require('jsmockito/node_modules/jshamcrest').JsHamcrest;
 
     describe('My object', function() {
-    	var Log = fell.Log;
-    	var LogStore = fell.destination.LogStore;
-
     	var store;
 
     	beforeEach(function() {
-    		store = new LogStore();
-    		Log.configure("info", {}, [store]);
+        JsMockito.Integration.importTo(global);
+    		JsHamcrest.Integration.copyMembers(global);
+
+        store = mock({onLog:function(){}});
+    		Log.configure('info', {}, [store]);
     	});
 
-    	it('when constructed, logs at info with its version and the parameter.', function() {
+    	it('logs at info level during construction with its version and the parameter', function() {
     		var myObj = new MyObject(23);
 
-    		assertThat(store, LogStore.contains(
-    				LogStore.event(
-    					'info',
-    					'mymodule.MyObject',
-    					[MyObject.LOG_MESSAGES['initialising'], MyObject.version, 23]
-    				)
-    			)
-    		);
+        verify(store, once()).onLog('mymodule.MyObject', 'info',
+          [MyObject.LOG_MESSAGES.INITIALISING, MyObject.version, 23]);
 
     		// or if the only thing we really care about is that the parameter
     		// is in the log message:
-
-    		assertThat(store, LogStore.contains(
-    				LogStore.event(
-    					anything(), anything(), hasItem(23)
-    				)
-    			)
-    		);
-
-    	}
+      verify(store, once()).onLog(anything(), anything(), hasItem(23));
+    	});
+    });
 ```
-
-The provided matchers, `LogStore.contains`, `LogStore.containsAll` and `LogStore.event` also accept
-JsHamcrest matchers as arguments.  You can make your tests less brittle by accepting anything that
-makes sense for the code to do.  So if your code currently logs at 'debug', but it would also make
-sense for it to log the same message at 'info', check against `either('debug').or('info')` rather
-than checking against what your code actually does.
-
-There is no matcher to check that no other log messages have been logged, since this is a test
-antipattern - future code changes may add more log messages, causing your tests to break even
-when there is no bug.
-
-In the above example, I store the actual text of the log message in a staticly referenced map with
-the code under test, and check against that rather than a hardcoded string.  This way, the text of
-the message can be changed easily without breaking the tests.
-
-The fell logger by default uses a string interpolation function so that the parts of the message
-that change do not break the message matching and so that they can be compared separately.
-
-Fell matchers don't require you to test every log message. This is desirable, as many log messages
-don't form part of your public interface, and testing them would increase the frailty of the tests
-without providing any benefit.

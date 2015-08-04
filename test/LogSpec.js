@@ -1,20 +1,18 @@
 'use strict';
 
 var Log = require('../src/Log');
-var sinon = require('sinon');
+var JsMockito = require('jsmockito').JsMockito;
+var JsHamcrest = require('jsmockito/node_modules/jshamcrest').JsHamcrest;
 
 describe('Log class', function() {
-	var log, mockStore, store;
+	var log, store;
 
 	beforeEach(function() {
-		log = new Log();
-		mockStore = sinon.mock({onLog:function(){}});
-		store = mockStore.object;
-		mockStore.expects('onLog').withArgs('no-such-args').never(); // fake expectation so we can register the store early
-	});
+		JsMockito.Integration.importTo(global);
+		JsHamcrest.Integration.copyMembers(global);
 
-	afterEach(function() {
-		mockStore.verify();
+		log = new Log();
+		store = mock({onLog:function(){}});
 	});
 
 	function args() {
@@ -28,24 +26,30 @@ describe('Log class', function() {
 
 	describe('when newly created, and configured with level info', function() {
 		beforeEach(function() {
+			// given
 			log.configure('info', {}, [store]);
 		});
 
 		it('makes all pertinent information available', function() {
-			mockStore.expects('onLog').withArgs(log.DEFAULT_COMPONENT, 'info', args('logging message at level {0}', '@info')).once();
+			// when
 			log.info('logging message at level {0}', '@info');
+
+			// then
+			verify(store, once()).onLog(log.DEFAULT_COMPONENT, 'info', ['logging message at level {0}', '@info']);
 		});
 
 		it('does not output debug level messages.', function() {
-			mockStore.expects('onLog').withArgs(sinon.match.any, 'fatal').once();
-			mockStore.expects('onLog').withArgs(sinon.match.any, 'error').once();
-			mockStore.expects('onLog').withArgs(sinon.match.any, 'warn').once();
-			mockStore.expects('onLog').withArgs(sinon.match.any, 'info').once();
-			mockStore.expects('onLog').withArgs(sinon.match.any, 'debug').never();
-
+			// when
 			log.Levels.forEach(function(level) {
 				log[level]('some message');
 			});
+
+			// then
+			verify(store, once()).onLog(anything(), 'fatal');
+			verify(store, once()).onLog(anything(), 'error');
+			verify(store, once()).onLog(anything(), 'warn');
+			verify(store, once()).onLog(anything(), 'info');
+			verify(store, never()).onLog(anything(), 'debug');
 		});
 
 		describe('and the level is changed to error,', function() {
@@ -54,69 +58,77 @@ describe('Log class', function() {
 			});
 
 			it('then only error and fatal messages are logged.', function() {
-				mockStore.expects('onLog').withArgs(sinon.match.any, 'fatal').once();
-				mockStore.expects('onLog').withArgs(sinon.match.any, 'error').once();
-				mockStore.expects('onLog').withArgs(sinon.match.any, 'warn').never();
-				mockStore.expects('onLog').withArgs(sinon.match.any, 'info').never();
-				mockStore.expects('onLog').withArgs(sinon.match.any, 'debug').never();
-
+				// when
 				log.Levels.forEach(function(level) {
 					log[level]('some message');
 				});
+
+				// then
+				verify(store, once()).onLog(anything(), 'fatal');
+				verify(store, once()).onLog(anything(), 'error');
+				verify(store, never()).onLog(anything(), 'warn');
+				verify(store, never()).onLog(anything(), 'info');
+				verify(store, never()).onLog(anything(), 'debug');
 			});
 
 			it('when the level is changed back, then the right messages are logged.', function() {
+				// given
 				log.changeLevel('info');
 
-				mockStore.expects('onLog').withArgs(sinon.match.any, 'fatal').once();
-				mockStore.expects('onLog').withArgs(sinon.match.any, 'error').once();
-				mockStore.expects('onLog').withArgs(sinon.match.any, 'warn').once();
-				mockStore.expects('onLog').withArgs(sinon.match.any, 'info').once();
-				mockStore.expects('onLog').withArgs(sinon.match.any, 'debug').never();
-
+				// when
 				log.Levels.forEach(function(level) {
 					log[level]('some message');
 				});
+
+				// then
+				verify(store, once()).onLog(anything(), 'fatal');
+				verify(store, once()).onLog(anything(), 'error');
+				verify(store, once()).onLog(anything(), 'warn');
+				verify(store, once()).onLog(anything(), 'info');
+				verify(store, never()).onLog(anything(), 'debug');
 			});
 		});
 
 		it('will provide a logger for a particular component configured to the same log level.', function() {
-			mockStore.expects('onLog').withArgs(sinon.match.any, 'warn', args('hello at warn level')).once();
-			mockStore.expects('onLog').withArgs(sinon.match.any, 'debug').never();
-
+			// given
 			var logger = log.getLogger('test');
+
+			// when
 			logger.warn('hello at warn level');
 			logger.debug('hello at debug level (should not be logged).');
+
+			// then
+			verify(store, once()).onLog(anything(), 'warn', ['hello at warn level']);
+			verify(store, never()).onLog(anything(), 'debug');
 		});
 
 		describe('when a second destination is added', function() {
-			var mockStore2, store2;
+			var store2;
 
 			beforeEach(function() {
-				mockStore2 = sinon.mock({onLog:function(){}});
-				store2 = mockStore2.object;
-				mockStore2.expects('onLog').withArgs('no-such-args').never(); // fake expectation so we can register the store early
+				store2 = mock({onLog:function(){}});
 				log.addDestination(store2);
 			});
 
-			afterEach(function() {
-				mockStore2.verify();
-			});
-
 			it('then it should log to both.', function() {
-				mockStore.expects('onLog').withArgs(sinon.match.any, 'warn', args('Hello')).once();
-				mockStore2.expects('onLog').withArgs(sinon.match.any, 'warn', args('Hello')).once();
-
+				// when
 				log.warn('Hello');
+
+				// then
+				verify(store, once()).onLog(anything(), 'warn', ['Hello']);
+				verify(store2, once()).onLog(anything(), 'warn', ['Hello']);
 			});
 
 			it('and then the first is removed, it should only log to the new one.', function() {
+				// given
 				log.removeDestination(store);
 
-				mockStore.expects('onLog').withArgs(sinon.match.any, 'warn', args('Hello')).never();
-				mockStore2.expects('onLog').withArgs(sinon.match.any, 'warn', args('Hello')).once();
-
+				// when
 				log.warn('Hello');
+
+				// then
+				verify(store, never()).onLog(anything(), 'warn', ['Hello']);
+				verify(store2, once()).onLog(anything(), 'warn', ['Hello']);
 			});
 		});
 	});
@@ -131,37 +143,53 @@ describe('Log class', function() {
 		});
 
 		it('and a logger is requested for a child of a configured component, should provide a logger with the correct level set.', function() {
-			mockStore.expects('onLog').withArgs('first.second.third.fourth', 'info', args('hi')).once();
-			mockStore.expects('onLog').withArgs(sinon.match.any, 'debug').never();
-
+			// given
 			var logger = log.getLogger('first.second.third.fourth');
+
+			// when
 			logger.info('hi');
 			logger.debug('hi');
+
+			// then
+			verify(store, once()).onLog('first.second.third.fourth', 'info', ['hi']);
+			verify(store, never()).onLog(anything(), 'debug');
 		});
 
 		it('and a logger is requested for a configured component, should provide a logger with the correct level set.', function() {
-			mockStore.expects('onLog').withArgs('other.second', 'debug', args('hi')).once();
-
+			// given
 			var logger = log.getLogger('other.second');
+
+			// when
 			logger.debug('hi');
+
+			// then
+			verify(store, once()).onLog('other.second', 'debug', ['hi']);
 		});
 
 		it('and a logger is requested for a component in between configurations, should provide a logger with the correct level set.', function() {
-			mockStore.expects('onLog').withArgs('first.second', 'fatal', args('hi')).once();
-			mockStore.expects('onLog').withArgs(sinon.match.any, 'error').never();
-
+			// given
 			var logger = log.getLogger('first.second');
+
+			// when
 			logger.error('hi');
 			logger.fatal('hi');
+
+			// then
+			verify(store, once()).onLog('first.second', 'fatal', ['hi']);
+			verify(store, never()).onLog(anything(), 'error');
 		});
 
 		it('and a logger is requested for a component that doesn\'t match a configuration, should provide a logger with the correct default level.', function() {
-			mockStore.expects('onLog').withArgs('firsty', 'error', args('hi')).once();
-			mockStore.expects('onLog').withArgs(sinon.match.any, 'warn').never();
-
+			// given
 			var logger = log.getLogger('firsty');
+
+			// when
 			logger.error('hi');
 			logger.warn('hi');
+
+			// then
+			verify(store, once()).onLog('firsty', 'error', ['hi']);
+			verify(store, never()).onLog(anything(), 'warn');
 		});
 	});
 });

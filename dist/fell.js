@@ -805,7 +805,7 @@ Levels.forEach(function(level) {
 	};
 });
 
-module.exports = new Log();
+module.exports = Log;
 
 },{"./Levels":8,"./Logger":10,"./destination/ConsoleLog":13,"emitr":6}],10:[function(require,module,exports){
 'use strict';
@@ -831,7 +831,7 @@ function Logger(emitter, component) {
 // creates a method for each of the log levels.
 Levels.forEach(function(level) {
 	Logger.prototype[level] = function() {
-		this.emitter.trigger('log', Date.now(), this.component, level, arguments);
+		this.emitter.trigger('log', this.component, level, arguments, Date.now());
 	};
 });
 
@@ -1244,7 +1244,7 @@ function ConsoleLogDestination(filter, formatter) {
 	this.formatter = formatter || defaultFormatter;
 }
 
-ConsoleLogDestination.prototype.onLog = function(time, component, level, data) {
+ConsoleLogDestination.prototype.onLog = function(component, level, data, time) {
 	if (this.filter(time, component, level, data)) {
 		this.output(level, this.formatter(time, component, level, data));
 	}
@@ -1277,7 +1277,7 @@ function logRecordToString() {
 	return Utils.templateFormatter(this.time, this.component, this.level, this.data);
 }
 
-LogStore.prototype.onLog = function(time, component, level, data) {
+LogStore.prototype.onLog = function(component, level, data, time) {
 	this.logRecords.push({
 		time: time,
 		component: component,
@@ -1302,67 +1302,15 @@ LogStore.prototype.toString = function() {
 	return 'Stored Log Messages:\n\t' + this.allMessages().join('\n\t');
 };
 
-// JsHamcrest globals:
-/*global allOf, anyOf, both, truth, hasMember*/
-
-LogStore.containsAll = function() {
-	var items = [];
-	for (var i = 0; i < arguments.length; i++) {
-		items.push(LogStore.contains(arguments[i]));
-	}
-	return allOf(items);
-};
-
-LogStore.containsAny = function() {
-	var items = [];
-	for (var i = 0; i < arguments.length; i++) {
-		items.push(LogStore.contains(arguments[i]));
-	}
-	return anyOf(items);
-};
-
-LogStore.contains = function(matcher) {
-	var baseMatcher = truth();
-	baseMatcher.matches = function(actual) {
-		// Should be a LogStore
-		if (!(actual instanceof LogStore)) {
-			return false;
-		}
-
-		for (var i = 0; i < actual.logRecords.length; i++) {
-			if (matcher.matches(actual.logRecords[i])) {
-				return true;
-			}
-		}
-		return false;
-	};
-	baseMatcher.describeTo = function(description) {
-		description.append('there has been a log event ').appendDescriptionOf(matcher);
-	};
-	return baseMatcher;
-};
-
-LogStore.event = function logEvent(level, component, data, time) {
-	var matcher = both(hasMember('level', level));
-	if (arguments.length > 1) {
-		matcher = matcher.and(hasMember('component', component));
-	}
-	if (arguments.length > 2) {
-		matcher = matcher.and(hasMember('data', data));
-	}
-	if (arguments.length > 3) {
-		matcher = matcher.and(hasMember('time', time));
-	}
-	return matcher;
-};
-
 module.exports = LogStore;
 
 },{"../RingBuffer":11,"../Utils":12}],15:[function(require,module,exports){
 'use strict';
 
+var Log = require('./Log');
+
 module.exports = {
-	Log: require('./Log'),
+	Log: new Log(),
 	RingBuffer: require('./RingBuffer'),
 	Utils: require('./Utils'),
 	destination: {
