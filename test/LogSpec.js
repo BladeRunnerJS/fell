@@ -1,3 +1,4 @@
+/*global mock,verify,once,never,anything*/
 'use strict';
 
 var Log = require('../src/Log');
@@ -12,12 +13,10 @@ describe('Log class', function() {
 		JsHamcrest.Integration.copyMembers(global);
 
 		log = new Log();
-		store = mock({onLog:function(){}});
+		store = mock({
+			onLog: function(){}
+		});
 	});
-
-	function args() {
-		return arguments;
-	}
 
 	it('can be used without throwing exceptions even if the log store has not been configured', function() {
 		log.configure('info');
@@ -106,7 +105,9 @@ describe('Log class', function() {
 			var store2;
 
 			beforeEach(function() {
-				store2 = mock({onLog:function(){}});
+				store2 = mock({
+					onLog: function(){}
+				});
 				log.addDestination(store2);
 			});
 
