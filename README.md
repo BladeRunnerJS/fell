@@ -29,28 +29,27 @@ The following lines will pull the libraries from github. For a proper deployment
 download them or check them out of github.
 
 ```
-   <script type="text/javascript" src="https://github.com/BladeRunnerJS/emitr/blob/master/dist/emitr.js"></script>
-   <script type="text/javascript" src="https://github.com/BladeRunnerJS/fell/blob/master/dist/fell.js"></script>
+<script type="text/javascript" src="https://github.com/BladeRunnerJS/emitr/blob/master/dist/emitr.js"></script>
+<script type="text/javascript" src="https://github.com/BladeRunnerJS/fell/blob/master/dist/fell.js"></script>
 ```
 
 In node, add fell to your package.json dependencies:
 
-    npm install --save fell
+		npm install --save fell
 
 ###  Getting the Log object.
 
 Start by getting the Log object.
 
 ```javascript
+// In the browser
+var Log = fell.Log;
 
-    // In the browser
-    var Log = fell.Log;
+// In node
+var Log = require('fell').Log;
 
-    // In node
-    var Log = require('fell').Log;
-
-    // Either:
-    var Log = typeof fell !== 'undefined' ? fell.Log : require('fell').Log;
+// Either:
+var Log = typeof fell !== 'undefined' ? fell.Log : require('fell').Log;
 ```
 
 ### The Default Logger
@@ -59,11 +58,9 @@ The default configuration has it outputting to the console (if one is available)
 using it immediately:
 
 ```javascript
-
-   Log.info("Log messages by default have {0} replaced {1}.",
-               "numbers surrounded by curly braces",
-               "by their arguments");
-   Log.warn("The levels supported are fatal, error, warn, info and debug");
+Log.info("Log messages by default have {0} replaced {1}.",
+	"numbers surrounded by curly braces", "by their arguments");
+Log.warn("The levels supported are fatal, error, warn, info and debug");
 ```
 
 ### Specific Loggers
@@ -72,17 +69,16 @@ You can get more finely grained control if you log to specified loggers within y
 classes.
 
 ```javascript
+function MyClass() {
+	this.log = Log.getLogger('mymodule.MyClass');
+}
 
-   function MyClass() {
-       this.log = Log.getLogger('mymodule.MyClass');
-   }
+MyClass.prototype.doAThing = function() {
+	this.log.warn("The thing that MyClass does is potentially dangerous!");
+};
 
-   MyClass.prototype.doAThing = function() {
-       this.log.warn("The thing that MyClass does is potentially dangerous!");
-   };
-
-   var myObj = new MyClass();
-   myObj.doAThing();
+var myObj = new MyClass();
+myObj.doAThing();
 ```
 
 ### Configuration
@@ -90,11 +86,10 @@ classes.
 To take advantage of this control, you can configure particular loggers to log at particular levels.
 
 ```javascript
-
-    Log.configure('error', {
-        'mymodule': 'info',
-        'mymodule.some.hierarchy': 'fatal'
-    });
+Log.configure('error', {
+	'mymodule': 'info',
+	'mymodule.some.hierarchy': 'fatal'
+});
 ```
 
 You can set up your logging by calling configure at the start of your program.  It takes up to three
@@ -116,19 +111,18 @@ destinations are all reset.
 If you want to modify the logging while in use you can use methods specifically for that:
 
 ```javascript
+// Changes the log level for things not configured specifically.
+Log.changeLevel('error');
 
-    // Changes the log level for things not configured specifically.
-    Log.changeLevel('error');
+// Changes the log level for mymodule.MyClass and things below it.
+Log.changeLevel('mymodule.MyClass', 'warn');
 
-    // Changes the log level for mymodule.MyClass and things below it.
-    Log.changeLevel('mymodule.MyClass', 'warn');
+// Adds a new destination that stores the most recent 10 log events.
+var store = new fell.destination.LogStore(10);
+Log.addDestination(store);
 
-    // Adds a new destination that stores the most recent 10 log events.
-    var store = new fell.destination.LogStore(10);
-    Log.addDestination(store);
-
-    // Removes the previously added destination.
-    Log.removeDestination(store);
+// Removes the previously added destination.
+Log.removeDestination(store);
 ```
 
 Testing
@@ -139,52 +133,50 @@ Care must be taken when testing for log messages in order to avoid writing fragi
 Here's an example of some logging code that you might want to test:
 
 ```javascript
+var Log = require('fell').Log;
 
-    var Log = require('fell').Log;
+function MyObject(parameter) {
+	this.log = Log.getLogger('mymodule.MyObject');
+	this.log.info(MyObject.LOG_MESSAGES.INITIALISING, MyObject.version, parameter);
+}
 
-    function MyObject(parameter) {
-      this.log = Log.getLogger('mymodule.MyObject');
-      this.log.info(MyObject.LOG_MESSAGES.INITIALISING, MyObject.version, parameter);
-    }
+MyObject.LOG_MESSAGES = {
+	INITIALISING: 'Initialising MyObject, version {0}, with parameter {1}.'
+}
 
-    MyObject.LOG_MESSAGES = {
-      INITIALISING: 'Initialising MyObject, version {0}, with parameter {1}.'
-    }
+MyObject.version = '1.2.3';
 
-    MyObject.version = '1.2.3';
-
-    module.exports = MyObject;
+module.exports = MyObject;
 ```
 
 and the corresponding test code to verify it:
 
 ```javascript
+var MyObject = require('..');
+var Log = require('fell').Log;
+var JsMockito = require('jsmockito').JsMockito;
+var JsHamcrest = require('jsmockito/node_modules/jshamcrest').JsHamcrest;
 
-    var MyObject = require('..');
-    var Log = require('fell').Log;
-    var JsMockito = require('jsmockito').JsMockito;
-    var JsHamcrest = require('jsmockito/node_modules/jshamcrest').JsHamcrest;
+describe('My object', function() {
+	var store;
 
-    describe('My object', function() {
-    	var store;
+	beforeEach(function() {
+		JsMockito.Integration.importTo(global);
+		JsHamcrest.Integration.copyMembers(global);
 
-    	beforeEach(function() {
-        JsMockito.Integration.importTo(global);
-    		JsHamcrest.Integration.copyMembers(global);
+		store = mock({onLog:function(){}});
+		Log.configure('info', {}, [store]);
+	});
 
-        store = mock({onLog:function(){}});
-    		Log.configure('info', {}, [store]);
-    	});
+	it('logs at info level during construction with its version and the parameter', function() {
+		var myObj = new MyObject(23);
 
-    	it('logs at info level during construction with its version and the parameter', function() {
-    		var myObj = new MyObject(23);
+		verify(store, once()).onLog('mymodule.MyObject', 'info',
+			[MyObject.LOG_MESSAGES.INITIALISING, MyObject.version, 23]);
 
-        verify(store, once()).onLog('mymodule.MyObject', 'info',
-          [MyObject.LOG_MESSAGES.INITIALISING, MyObject.version, 23]);
-
-    		// or if the only thing we really care about is that the parameter
-    		// is in the log message:
-      verify(store, once()).onLog(anything(), anything(), hasItem(23));
-    	});
-    });
+		// or if the only thing we really care about is that the parameter
+		// is in the log message:
+		 verify(store, once()).onLog(anything(), anything(), hasItem(23));
+	});
+});
 ```
