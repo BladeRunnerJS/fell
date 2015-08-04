@@ -1225,11 +1225,11 @@ var defaultFormatter = (global.process && global.process.stdout && Boolean(globa
 
 // Browsers provide different visual display for different log levels.
 var CONSOLE_OUTPUT = {
-	'fatal': console.error,
-	'error': console.error,
-	'warn': console.warn,
-	'info': console.info,
-	'debug': console.debug || console.log
+	'fatal': 'error',
+	'error': 'error',
+	'warn': 'warn',
+	'info': 'info',
+	'debug': 'log'
 };
 
 /**
@@ -1251,7 +1251,7 @@ ConsoleLogDestination.prototype.onLog = function(component, level, data, time) {
 };
 
 ConsoleLogDestination.prototype.output = function(level, message) {
-	CONSOLE_OUTPUT[level].call(console, message);
+	console[CONSOLE_OUTPUT[level]].call(console, message);
 };
 
 module.exports = ConsoleLogDestination;
