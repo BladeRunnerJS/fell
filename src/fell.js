@@ -1,17 +1,13 @@
 'use strict';
 
 var Log = require('./Log');
+var LogStore = require('./destination/LogStore');
+var ConsoleLog = require('./destination/ConsoleLog');
 
-module.exports = {
-	Log: new Log(),
-	RingBuffer: require('./RingBuffer'),
-	Utils: require('./Utils'),
-	destination: {
-		LogStore: require('./destination/LogStore')
-	}
+var fell = new Log();
+fell.destination = {
+	LogStore: LogStore,
+	ConsoleLog: ConsoleLog
 };
 
-if (typeof console !== 'undefined') {
-	var ConsoleLogDestination = require('./destination/ConsoleLog');
-	module.exports.destination.ConsoleLog = new ConsoleLogDestination();
-}
+module.exports = fell;

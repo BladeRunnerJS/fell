@@ -1,6 +1,6 @@
 'use strict';
 
-var Util = require('..').Utils;
+var Util = require('../src/Utils');
 var expect = require('expectations');
 
 describe('The Log Utility ', function() {

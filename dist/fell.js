@@ -1308,20 +1308,16 @@ module.exports = LogStore;
 'use strict';
 
 var Log = require('./Log');
+var LogStore = require('./destination/LogStore');
+var ConsoleLog = require('./destination/ConsoleLog');
 
-module.exports = {
-	Log: new Log(),
-	RingBuffer: require('./RingBuffer'),
-	Utils: require('./Utils'),
-	destination: {
-		LogStore: require('./destination/LogStore')
-	}
+var fell = new Log();
+fell.destination = {
+	LogStore: LogStore,
+	ConsoleLog: ConsoleLog
 };
 
-if (typeof console !== 'undefined') {
-	var ConsoleLogDestination = require('./destination/ConsoleLog');
-	module.exports.destination.ConsoleLog = new ConsoleLogDestination();
-}
+module.exports = fell;
 
-},{"./Log":9,"./RingBuffer":11,"./Utils":12,"./destination/ConsoleLog":13,"./destination/LogStore":14}]},{},[15])(15)
+},{"./Log":9,"./destination/ConsoleLog":13,"./destination/LogStore":14}]},{},[15])(15)
 });

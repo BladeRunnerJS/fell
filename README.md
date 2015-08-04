@@ -4,9 +4,6 @@ A logging library that works in node and the browser.
 
 [![Build Status](https://travis-ci.org/BladeRunnerJS/fell.png)](https://travis-ci.org/BladeRunnerJS/fell)
 
-The rendered form of this document includes the fell script so you can open
-a console and try it immediately.
-
 ## Aims
 
 * Very low cost when logging at a level not in use.
@@ -35,17 +32,10 @@ npm install --save fell
 
 ###  Getting the Log object.
 
-Start by getting the Log object.
+Start by getting fell (within a browser `fell` will be available globally).
 
 ```js
-// In the browser
-var Log = fell.Log;
-
-// In node
-var Log = require('fell').Log;
-
-// Either:
-var Log = typeof fell !== 'undefined' ? fell.Log : require('fell').Log;
+var fell = require('fell');
 ```
 
 ### The Default Logger
@@ -54,9 +44,9 @@ The default configuration has it outputting to the console (if one is available)
 using it immediately:
 
 ```js
-Log.info("Log messages by default have {0} replaced {1}.",
+fell.info("Log messages by default have {0} replaced {1}.",
 	"numbers surrounded by curly braces", "by their arguments");
-Log.warn("The levels supported are fatal, error, warn, info and debug");
+fell.warn("The levels supported are fatal, error, warn, info and debug");
 ```
 
 ### Specific Loggers
@@ -66,7 +56,7 @@ classes.
 
 ```js
 function MyClass() {
-	this.log = Log.getLogger('mymodule.MyClass');
+	this.log = fell.getLogger('mymodule.MyClass');
 }
 
 MyClass.prototype.doAThing = function() {
@@ -82,7 +72,7 @@ myObj.doAThing();
 To take advantage of this control, you can configure particular loggers to log at particular levels.
 
 ```js
-Log.configure('error', {
+fell.configure('error', {
 	'mymodule': 'info',
 	'mymodule.some.hierarchy': 'fatal'
 });
@@ -101,24 +91,24 @@ The third argument is an array of destinations that log events should be routed 
 pass anything (as in the above example), this will default to an array containing only a logger that
 outputs to the console object in environments that support this.
 
-Calling `Log.configure` clears the state of the logger, so the levels, configuration and log
+Calling `fell.configure` clears the state of the logger, so the levels, configuration and log
 destinations are all reset.
 
 If you want to modify the logging while in use you can use methods specifically for that:
 
 ```js
 // Changes the log level for things not configured specifically.
-Log.changeLevel('error');
+fell.changeLevel('error');
 
 // Changes the log level for mymodule.MyClass and things below it.
-Log.changeLevel('mymodule.MyClass', 'warn');
+fell.changeLevel('mymodule.MyClass', 'warn');
 
 // Adds a new destination that stores the most recent 10 log events.
 var store = new fell.destination.LogStore(10);
-Log.addDestination(store);
+fell.addDestination(store);
 
 // Removes the previously added destination.
-Log.removeDestination(store);
+fell.removeDestination(store);
 ```
 
 ## Testing
@@ -128,10 +118,10 @@ Care must be taken when testing for log messages in order to avoid writing fragi
 Here's an example of some logging code that you might want to test:
 
 ```js
-var Log = require('fell').Log;
+var fell = require('fell');
 
 function MyObject(parameter) {
-	this.log = Log.getLogger('mymodule.MyObject');
+	this.log = fell.getLogger('mymodule.MyObject');
 	this.log.info(MyObject.LOG_MESSAGES.INITIALISING, MyObject.version, parameter);
 }
 
@@ -148,7 +138,7 @@ and the corresponding test code to verify it:
 
 ```js
 var MyObject = require('..');
-var Log = require('fell').Log;
+var fell = require('fell');
 var JsMockito = require('jsmockito').JsMockito;
 var JsHamcrest = require('jsmockito/node_modules/jshamcrest').JsHamcrest;
 
@@ -160,7 +150,7 @@ describe('My object', function() {
 		JsHamcrest.Integration.copyMembers(global);
 
 		store = mock({onLog:function(){}});
-		Log.configure('info', {}, [store]);
+		fell.configure('info', {}, [store]);
 	});
 
 	it('logs at info level during construction with its version and the parameter', function() {

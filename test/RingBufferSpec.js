@@ -1,6 +1,6 @@
 'use strict';
 
-var RingBuffer = require('..').RingBuffer;
+var RingBuffer = require('../src/RingBuffer');
 var expect = require('expectations');
 
 describe('A RingBuffer ', function(){
