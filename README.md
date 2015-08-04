@@ -1,8 +1,4 @@
-<script type="text/javascript" src="https://github.com/BladeRunnerJS/emitr/blob/master/dist/emitr.js"></script>
-<script type="text/javascript" src="dist/fell.js"></script>
-
-fell
-====
+# fell
 
 A logging library that works in node and the browser.
 
@@ -11,17 +7,15 @@ A logging library that works in node and the browser.
 The rendered form of this document includes the fell script so you can open
 a console and try it immediately.
 
-Aims
-----
+## Aims
 
 * Very low cost when logging at a level not in use.
 * Friendly to unit testing.
 * Allows you to log at different levels from within different pieces of code.
 * Quick and easy to get started with.
-* Works in both node.js and the browser.
+* Works in both Node.js and the browser.
 
-Usage
------
+## Usage
 
 In a web browser, you'll need to include [emitr.js](https://github.com/BladeRunnerJS/emitr/blob/master/dist/emitr.js) and [fell.js](dist/fell.js).
 
@@ -33,15 +27,17 @@ download them or check them out of github.
 <script type="text/javascript" src="https://github.com/BladeRunnerJS/fell/blob/master/dist/fell.js"></script>
 ```
 
-In node, add fell to your package.json dependencies:
+In Node.js, add fell to your package.json dependencies:
 
-		npm install --save fell
+```shell
+npm install --save fell
+```
 
 ###  Getting the Log object.
 
 Start by getting the Log object.
 
-```javascript
+```js
 // In the browser
 var Log = fell.Log;
 
@@ -57,7 +53,7 @@ var Log = typeof fell !== 'undefined' ? fell.Log : require('fell').Log;
 The default configuration has it outputting to the console (if one is available), so you can start
 using it immediately:
 
-```javascript
+```js
 Log.info("Log messages by default have {0} replaced {1}.",
 	"numbers surrounded by curly braces", "by their arguments");
 Log.warn("The levels supported are fatal, error, warn, info and debug");
@@ -68,7 +64,7 @@ Log.warn("The levels supported are fatal, error, warn, info and debug");
 You can get more finely grained control if you log to specified loggers within your modules or
 classes.
 
-```javascript
+```js
 function MyClass() {
 	this.log = Log.getLogger('mymodule.MyClass');
 }
@@ -85,7 +81,7 @@ myObj.doAThing();
 
 To take advantage of this control, you can configure particular loggers to log at particular levels.
 
-```javascript
+```js
 Log.configure('error', {
 	'mymodule': 'info',
 	'mymodule.some.hierarchy': 'fatal'
@@ -110,7 +106,7 @@ destinations are all reset.
 
 If you want to modify the logging while in use you can use methods specifically for that:
 
-```javascript
+```js
 // Changes the log level for things not configured specifically.
 Log.changeLevel('error');
 
@@ -125,14 +121,13 @@ Log.addDestination(store);
 Log.removeDestination(store);
 ```
 
-Testing
--------
+## Testing
 
 Care must be taken when testing for log messages in order to avoid writing fragile tests. To help with this, we recommend the use of a mocking library like [JsMockito](http://jsmockito.org/).
 
 Here's an example of some logging code that you might want to test:
 
-```javascript
+```js
 var Log = require('fell').Log;
 
 function MyObject(parameter) {
@@ -151,7 +146,7 @@ module.exports = MyObject;
 
 and the corresponding test code to verify it:
 
-```javascript
+```js
 var MyObject = require('..');
 var Log = require('fell').Log;
 var JsMockito = require('jsmockito').JsMockito;
