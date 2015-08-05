@@ -26,7 +26,6 @@
     "browserify": "^11.0.1",
     "eslint": "^0.24.1",
     "expectations": "^0.5.1",
-    "jsmockito": "^1.0.5",
     "karma": "^0.13.3",
     "karma-browserify": "^4.2.1",
     "karma-chrome-launcher": "^0.2.0",
@@ -34,6 +33,7 @@
     "karma-firefox-launcher": "^0.1.6",
     "karma-mocha": "^0.2.0",
     "karma-sauce-launcher": "^0.2.14",
-    "mocha": "^2.2.5"
+    "mocha": "^2.2.5",
+    "mochito": "^0.0.0"
   }
 }

@@ -1,19 +1,14 @@
-/*global mock,verify,once,never,anything*/
 'use strict';
 
 var Log = require('../src/Log');
-var JsMockito = require('jsmockito').JsMockito;
-var JsHamcrest = require('jsmockito/node_modules/jshamcrest').JsHamcrest;
+var mochito = require('mochito');
 
 describe('Log class', function() {
 	var log, store;
 
 	beforeEach(function() {
-		JsMockito.Integration.importTo(global);
-		JsHamcrest.Integration.copyMembers(global);
-
 		log = new Log();
-		store = mock({
+		store = mochito.mock({
 			onLog: function(){}
 		});
 	});
@@ -34,7 +29,7 @@ describe('Log class', function() {
 			log.info('logging message at level {0}', '@info');
 
 			// then
-			verify(store, once()).onLog(log.DEFAULT_COMPONENT, 'info', ['logging message at level {0}', '@info']);
+			mochito.verify(store, mochito.once()).onLog(log.DEFAULT_COMPONENT, 'info', ['logging message at level {0}', '@info']);
 		});
 
 		it('does not output debug level messages.', function() {
@@ -44,11 +39,11 @@ describe('Log class', function() {
 			});
 
 			// then
-			verify(store, once()).onLog(anything(), 'fatal');
-			verify(store, once()).onLog(anything(), 'error');
-			verify(store, once()).onLog(anything(), 'warn');
-			verify(store, once()).onLog(anything(), 'info');
-			verify(store, never()).onLog(anything(), 'debug');
+			mochito.verify(store, mochito.once()).onLog(mochito.anything(), 'fatal');
+			mochito.verify(store, mochito.once()).onLog(mochito.anything(), 'error');
+			mochito.verify(store, mochito.once()).onLog(mochito.anything(), 'warn');
+			mochito.verify(store, mochito.once()).onLog(mochito.anything(), 'info');
+			mochito.verify(store, mochito.never()).onLog(mochito.anything(), 'debug');
 		});
 
 		describe('and the level is changed to error,', function() {
@@ -63,11 +58,11 @@ describe('Log class', function() {
 				});
 
 				// then
-				verify(store, once()).onLog(anything(), 'fatal');
-				verify(store, once()).onLog(anything(), 'error');
-				verify(store, never()).onLog(anything(), 'warn');
-				verify(store, never()).onLog(anything(), 'info');
-				verify(store, never()).onLog(anything(), 'debug');
+				mochito.verify(store, mochito.once()).onLog(mochito.anything(), 'fatal');
+				mochito.verify(store, mochito.once()).onLog(mochito.anything(), 'error');
+				mochito.verify(store, mochito.never()).onLog(mochito.anything(), 'warn');
+				mochito.verify(store, mochito.never()).onLog(mochito.anything(), 'info');
+				mochito.verify(store, mochito.never()).onLog(mochito.anything(), 'debug');
 			});
 
 			it('when the level is changed back, then the right messages are logged.', function() {
@@ -80,11 +75,11 @@ describe('Log class', function() {
 				});
 
 				// then
-				verify(store, once()).onLog(anything(), 'fatal');
-				verify(store, once()).onLog(anything(), 'error');
-				verify(store, once()).onLog(anything(), 'warn');
-				verify(store, once()).onLog(anything(), 'info');
-				verify(store, never()).onLog(anything(), 'debug');
+				mochito.verify(store, mochito.once()).onLog(mochito.anything(), 'fatal');
+				mochito.verify(store, mochito.once()).onLog(mochito.anything(), 'error');
+				mochito.verify(store, mochito.once()).onLog(mochito.anything(), 'warn');
+				mochito.verify(store, mochito.once()).onLog(mochito.anything(), 'info');
+				mochito.verify(store, mochito.never()).onLog(mochito.anything(), 'debug');
 			});
 		});
 
@@ -97,15 +92,15 @@ describe('Log class', function() {
 			logger.debug('hello at debug level (should not be logged).');
 
 			// then
-			verify(store, once()).onLog(anything(), 'warn', ['hello at warn level']);
-			verify(store, never()).onLog(anything(), 'debug');
+			mochito.verify(store, mochito.once()).onLog(mochito.anything(), 'warn', ['hello at warn level']);
+			mochito.verify(store, mochito.never()).onLog(mochito.anything(), 'debug');
 		});
 
 		describe('when a second destination is added', function() {
 			var store2;
 
 			beforeEach(function() {
-				store2 = mock({
+				store2 = mochito.mock({
 					onLog: function(){}
 				});
 				log.addDestination(store2);
@@ -116,8 +111,8 @@ describe('Log class', function() {
 				log.warn('Hello');
 
 				// then
-				verify(store, once()).onLog(anything(), 'warn', ['Hello']);
-				verify(store2, once()).onLog(anything(), 'warn', ['Hello']);
+				mochito.verify(store, mochito.once()).onLog(mochito.anything(), 'warn', ['Hello']);
+				mochito.verify(store2, mochito.once()).onLog(mochito.anything(), 'warn', ['Hello']);
 			});
 
 			it('and then the first is removed, it should only log to the new one.', function() {
@@ -128,8 +123,8 @@ describe('Log class', function() {
 				log.warn('Hello');
 
 				// then
-				verify(store, never()).onLog(anything(), 'warn', ['Hello']);
-				verify(store2, once()).onLog(anything(), 'warn', ['Hello']);
+				mochito.verify(store, mochito.never()).onLog(mochito.anything(), 'warn', ['Hello']);
+				mochito.verify(store2, mochito.once()).onLog(mochito.anything(), 'warn', ['Hello']);
 			});
 		});
 	});
@@ -152,8 +147,8 @@ describe('Log class', function() {
 			logger.debug('hi');
 
 			// then
-			verify(store, once()).onLog('first.second.third.fourth', 'info', ['hi']);
-			verify(store, never()).onLog(anything(), 'debug');
+			mochito.verify(store, mochito.once()).onLog('first.second.third.fourth', 'info', ['hi']);
+			mochito.verify(store, mochito.never()).onLog(mochito.anything(), 'debug');
 		});
 
 		it('and a logger is requested for a configured component, should provide a logger with the correct level set.', function() {
@@ -164,7 +159,7 @@ describe('Log class', function() {
 			logger.debug('hi');
 
 			// then
-			verify(store, once()).onLog('other.second', 'debug', ['hi']);
+			mochito.verify(store, mochito.once()).onLog('other.second', 'debug', ['hi']);
 		});
 
 		it('and a logger is requested for a component in between configurations, should provide a logger with the correct level set.', function() {
@@ -176,8 +171,8 @@ describe('Log class', function() {
 			logger.fatal('hi');
 
 			// then
-			verify(store, once()).onLog('first.second', 'fatal', ['hi']);
-			verify(store, never()).onLog(anything(), 'error');
+			mochito.verify(store, mochito.once()).onLog('first.second', 'fatal', ['hi']);
+			mochito.verify(store, mochito.never()).onLog(mochito.anything(), 'error');
 		});
 
 		it('and a logger is requested for a component that doesn\'t match a configuration, should provide a logger with the correct default level.', function() {
@@ -189,8 +184,8 @@ describe('Log class', function() {
 			logger.warn('hi');
 
 			// then
-			verify(store, once()).onLog('firsty', 'error', ['hi']);
-			verify(store, never()).onLog(anything(), 'warn');
+			mochito.verify(store, mochito.once()).onLog('firsty', 'error', ['hi']);
+			mochito.verify(store, mochito.never()).onLog(mochito.anything(), 'warn');
 		});
 	});
 });

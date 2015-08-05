@@ -113,7 +113,8 @@ fell.removeDestination(store);
 
 ## Testing
 
-Care must be taken when testing for log messages in order to avoid writing fragile tests. To help with this, we recommend the use of a mocking library like [JsMockito](http://jsmockito.org/).
+Care must be taken when testing for log messages in order to avoid writing fragile tests. To help with this, we
+recommend the use of a mocking library like [mochito](https://github.com/dchambers/mochito).
 
 Here's an example of some logging code that you might want to test:
 
@@ -139,29 +140,25 @@ and the corresponding test code to verify it:
 ```js
 var MyObject = require('..');
 var fell = require('fell');
-var JsMockito = require('jsmockito').JsMockito;
-var JsHamcrest = require('jsmockito/node_modules/jshamcrest').JsHamcrest;
+var mochito = require('mochito');
 
 describe('My object', function() {
 	var store;
 
 	beforeEach(function() {
-		JsMockito.Integration.importTo(global);
-		JsHamcrest.Integration.copyMembers(global);
-
-		store = mock({onLog:function(){}});
+		store = mochito.mock({onLog:function(){}});
 		fell.configure('info', {}, [store]);
 	});
 
 	it('logs at info level during construction with its version and the parameter', function() {
 		var myObj = new MyObject(23);
 
-		verify(store, once()).onLog('mymodule.MyObject', 'info',
+		mochito.verify(store, mochito.once()).onLog('mymodule.MyObject', 'info',
 			[MyObject.LOG_MESSAGES.INITIALISING, MyObject.version, 23]);
 
 		// or if the only thing we really care about is that the parameter
 		// is in the log message:
-		 verify(store, once()).onLog(anything(), anything(), hasItem(23));
+		mochito.verify(store, mochito.once()).onLog(mochito.anything(), mochito.anything(), mochito.hasItem(23));
 	});
 });
 ```
