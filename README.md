@@ -114,7 +114,7 @@ fell.removeDestination(store);
 ## Testing
 
 Care must be taken when testing for log messages in order to avoid writing fragile tests. To help with this, we
-recommend the use of a mocking library like [mochito](https://github.com/dchambers/mochito).
+recommend the use of a mocking library like [Mochito](https://github.com/dchambers/mochito).
 
 Here's an example of some logging code that you might want to test:
 
