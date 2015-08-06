@@ -1,12 +1,11 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.fell = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+/*eslint dot-notation:0*/
 'use strict';
 
 var slice = Array.prototype.slice;
 
 var metaEvents = require('./events');
 var MultiMap = require('./MultiMap');
-
-var getPrototypeOf = require('./shams').getPrototypeOf;
 
 ///////////////////////////////////////////////////////////////////////////
 var ONCE_FUNCTION_MARKER = {};
@@ -160,7 +159,7 @@ Emitter.prototype = {
 			// clear all listeners for a particular eventIdentifier.
 			if (this._emitterListeners.hasAny(eventIdentifier)) {
 				var listeners = this._emitterListeners.getValues(eventIdentifier);
-				this._emitterListeners.delete(eventIdentifier);
+				this._emitterListeners['delete'](eventIdentifier);
 				if (this._emitterMetaEventsOn === true) {
 					notifyRemoves(this, listeners);
 				}
@@ -210,14 +209,14 @@ Emitter.prototype = {
 
 			// navigate up the prototype chain emitting against the constructors.
 			if (typeof event === 'object') {
-				var last = event, proto = getPrototypeOf(event);
+				var last = event, proto = Object.getPrototypeOf(event);
 				while (proto !== null && proto !== last) {
 					if (this._emitterListeners.hasAny(proto.constructor)) {
 						anyListeners = true;
 						notify(this._emitterListeners.getValues(proto.constructor), arguments);
 					}
 					last = proto;
-					proto = getPrototypeOf(proto);
+					proto = Object.getPrototypeOf(proto);
 				}
 			}
 		}
@@ -281,10 +280,9 @@ Emitter.mixInto = function(destination) {
 
 module.exports = Emitter;
 
-},{"./MultiMap":4,"./events":5,"./shams":7}],2:[function(require,module,exports){
+},{"./MultiMap":4,"./events":5}],2:[function(require,module,exports){
 'use strict';
 
-var shams = require('./shams');
 // Event ///////////////////////////////////////////////////////////////////////////////////////////
 
 /**
@@ -326,7 +324,7 @@ Event.extend = function inlineExtend(properties) {
 		};
 	}
 	subclassConstructor.superclass = superclass;
-	subclassConstructor.prototype = shams.create(superclass.prototype, {
+	subclassConstructor.prototype = Object.create(superclass.prototype, {
 		constructor: {
 			enumerable: false, value: subclassConstructor
 		}
@@ -338,7 +336,7 @@ Event.extend = function inlineExtend(properties) {
 	}
 
 	if (typeof properties === 'object') {
-		if (shams.getPrototypeOf(properties) !== Object.prototype) {
+		if (Object.getPrototypeOf(properties) !== Object.prototype) {
 			throw new Error('extend: Can\'t extend something that already has a prototype chain.');
 		}
 		for (var instanceProperty in properties) {
@@ -374,7 +372,7 @@ Event.prototype.toString = function() {
 
 module.exports = Event;
 
-},{"./shams":7}],3:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 (function (global){
 /*eslint no-native-reassign:0*/
 'use strict';
@@ -443,7 +441,7 @@ module.exports = Map;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],4:[function(require,module,exports){
-/*eslint no-native-reassign:0*/
+/*eslint no-native-reassign:0, dot-notation:0*/
 'use strict';
 
 var Map = require('./Map');
@@ -481,7 +479,7 @@ MultiMap.prototype = {
 		var values = this._map.get(key).filter(filterFunction);
 
 		if (values.length === 0) {
-			this._map.delete(key);
+			this._map['delete'](key);
 		} else {
 			this._map.set(key, values);
 		}
@@ -496,7 +494,7 @@ MultiMap.prototype = {
 		this._map.forEach(function(values, key) {
 			var newValues = values.filter(filterFunction);
 			if (newValues.length === 0) {
-				map.delete(key);
+				map['delete'](key);
 			} else {
 				map.set(key, newValues);
 			}
@@ -517,7 +515,7 @@ MultiMap.prototype = {
 		return this._map.has(key);
 	},
 	'delete': function del(key) {
-		this._map.delete(key);
+		this._map['delete'](key);
 	}
 };
 
@@ -612,85 +610,11 @@ module.exports.meta = require('./events');
 module.exports.Event = require('./Event');
 
 },{"./Emitter":1,"./Event":2,"./events":5}],7:[function(require,module,exports){
-/*eslint no-proto:0*/
-'use strict';
-
-// Partial 'sham' to work around ie8s lack of es5 //////////////////////////////////////////////
-// When IE8 support is no longer needed, all these can be dropped in favour of the es5 methods.
-
-exports.getPrototypeOf = function getPrototypeOf(obj) {
-	if (Object.getPrototypeOf) {
-		var proto = Object.getPrototypeOf(obj);
-
-		// to avoid bad shams...
-		if (proto !== obj) {
-			return proto;
-		}
-	}
-
-	// this is what most shams do, but sometimes it's wrong.
-	if (obj.constructor && obj.constructor.prototype && obj.constructor.prototype !== obj) {
-		return obj.constructor.prototype;
-	}
-
-	// this works only if we've been kind enough to supply a superclass property
-	// (which we do when we extend classes).
-	if (obj.constructor && obj.constructor.superclass) {
-		return obj.constructor.superclass.prototype;
-	}
-
-	// can't find a good prototype.
-	return null;
-};
-
-var defineProperty = function(obj, prop, descriptor) {
-	obj[prop] = descriptor.value;
-};
-if (Object.defineProperty) {
-	try {
-		// IE8 throws an error here.
-		Object.defineProperty({}, 'x', {});
-		defineProperty = Object.defineProperty;
-	} catch (e) {
-		// do nothing
-	}
-}
-exports.defineProperty = defineProperty;
-
-exports.create = function create(proto, descriptors) {
-	var result;
-
-	if(Object.create) {
-		result = Object.create(proto, descriptors);
-
-		var dunderProtoPassedIn = (proto && proto.__proto__) || (descriptors && descriptors.__proto__);
-
-		if(result.__proto__ && !dunderProtoPassedIn) {
-			//ES5 shim added this and it's a lie so delete it.
-			delete result.__proto__;
-		}
-	} else {
-		var MyConstructor = function() {};
-		MyConstructor.prototype = proto;
-
-		result = new MyConstructor();
-
-		var keys = Object.keys(descriptors);
-		for (var i = 0; i < keys.length; ++i) {
-			var key = keys[i];
-			defineProperty(result, key, descriptors[key]);
-		}
-	}
-
-	return result;
-};
-
-},{}],8:[function(require,module,exports){
 'use strict';
 
 module.exports = ['fatal', 'error', 'warn', 'info', 'debug'];
 
-},{}],9:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 'use strict';
 
 var Emitter = require('emitr');
@@ -807,7 +731,7 @@ Levels.forEach(function(level) {
 
 module.exports = Log;
 
-},{"./Levels":8,"./Logger":10,"./destination/ConsoleLog":13,"emitr":6}],10:[function(require,module,exports){
+},{"./Levels":7,"./Logger":9,"./destination/ConsoleLog":12,"emitr":6}],9:[function(require,module,exports){
 'use strict';
 
 var Levels = require('./Levels');
@@ -858,7 +782,7 @@ Logger.prototype._setLevel = function(level) {
 
 module.exports = Logger;
 
-},{"./Levels":8}],11:[function(require,module,exports){
+},{"./Levels":7}],10:[function(require,module,exports){
 'use strict';
 
 var Utils = require('./Utils');
@@ -1040,7 +964,7 @@ RingBuffer.prototype._changeWindow = function(incoming) {
 
 module.exports = RingBuffer;
 
-},{"./Utils":12}],12:[function(require,module,exports){
+},{"./Utils":11}],11:[function(require,module,exports){
 'use strict';
 
 var DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -1213,7 +1137,7 @@ module.exports = {
 	allowAll: allowAll
 };
 
-},{}],13:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -1257,7 +1181,7 @@ ConsoleLogDestination.prototype.output = function(level, message) {
 module.exports = ConsoleLogDestination;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../Utils":12}],14:[function(require,module,exports){
+},{"../Utils":11}],13:[function(require,module,exports){
 'use strict';
 
 var Utils = require('../Utils');
@@ -1304,7 +1228,7 @@ LogStore.prototype.toString = function() {
 
 module.exports = LogStore;
 
-},{"../RingBuffer":11,"../Utils":12}],15:[function(require,module,exports){
+},{"../RingBuffer":10,"../Utils":11}],14:[function(require,module,exports){
 'use strict';
 
 var Log = require('./Log');
@@ -1319,5 +1243,5 @@ fell.destination = {
 
 module.exports = fell;
 
-},{"./Log":9,"./destination/ConsoleLog":13,"./destination/LogStore":14}]},{},[15])(15)
+},{"./Log":8,"./destination/ConsoleLog":12,"./destination/LogStore":13}]},{},[14])(14)
 });

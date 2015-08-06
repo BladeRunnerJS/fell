@@ -5,7 +5,7 @@
   "homepage": "http://BladeRunnerJS.github.io/fell",
   "license": "MIT",
   "dependencies": {
-    "emitr": "^0.0.6"
+    "emitr": "^0.0.8"
   },
   "repository": {
     "type": "git",
@@ -24,9 +24,10 @@
   },
   "devDependencies": {
     "browserify": "^11.0.1",
+    "core-js": "^1.0.1",
     "eslint": "^0.24.1",
     "expectations": "^0.5.1",
-    "karma": "^0.13.3",
+    "karma": "^0.13.6",
     "karma-browserify": "^4.2.1",
     "karma-chrome-launcher": "^0.2.0",
     "karma-cli": "^0.1.0",
