@@ -1,47 +1,41 @@
 # fell
 
-A logging library that works in node and the browser.
+A logging library that works in Node.js and the browser.
 
 [![Build Status](https://travis-ci.org/BladeRunnerJS/fell.png)](https://travis-ci.org/BladeRunnerJS/fell)
 
-## Aims
+The aims of _fell_ are as follows:
 
-* Very low cost when logging at a level not in use.
-* Friendly to unit testing.
-* Allows you to log at different levels from within different pieces of code.
-* Quick and easy to get started with.
-* Works in both Node.js and the browser.
+  * Very low cost when logging at a level not in use.
+  * Friendly to unit testing.
+  * Allows you to log at different levels from within different pieces of code.
+  * Quick and easy to get started with.
+  * Works in both Node.js and the browser.
 
-## Usage
+## Getting It
 
-In a web browser, you'll need to include [emitr.js](https://github.com/BladeRunnerJS/emitr/blob/master/dist/emitr.js) and [fell.js](dist/fell.js).
+In Node.js:
 
-The following lines will pull the libraries from github. For a proper deployment, you should
-download them or check them out of github.
-
-```
-<script type="text/javascript" src="https://github.com/BladeRunnerJS/emitr/blob/master/dist/emitr.js"></script>
-<script type="text/javascript" src="https://github.com/BladeRunnerJS/fell/blob/master/dist/fell.js"></script>
-```
-
-In Node.js, add fell to your package.json dependencies:
-
-```shell
+```sh
 npm install --save fell
 ```
 
-###  Getting the Log object.
-
-Start by getting fell (within a browser `fell` will be available globally).
+then:
 
 ```js
 var fell = require('fell');
 ```
 
+For the browser, download the latest releases of [fell](https://github.com/BladeRunnerJS/fell/releases) and [emitr](https://github.com/BladeRunnerJS/emitr/releases), and refer to them from your script tags:
+
+```html
+<script type="text/javascript" src="dist/emitr.js"></script>
+<script type="text/javascript" src="dist/fell.js"></script>
+```
+
 ### The Default Logger
 
-The default configuration has it outputting to the console (if one is available), so you can start
-using it immediately:
+The default configuration has it outputting to the console (if one is available), so you can start using it immediately:
 
 ```js
 fell.info("Log messages by default have {0} replaced {1}.",
@@ -51,8 +45,7 @@ fell.warn("The levels supported are fatal, error, warn, info and debug");
 
 ### Specific Loggers
 
-You can get more finely grained control if you log to specified loggers within your modules or
-classes.
+You can get more finely grained control if you log to specified loggers within your modules or classes.
 
 ```js
 function MyClass() {
@@ -78,21 +71,13 @@ fell.configure('error', {
 });
 ```
 
-You can set up your logging by calling configure at the start of your program.  It takes up to three
-arguments.  The first argument is the default log level that will be done for all loggers that don't
-have more specific configuration.
+You can set up your logging by calling configure at the start of your program.  It takes up to three arguments.  The first argument is the default log level that will be done for all loggers that don't have more specific configuration.
 
-The second argument is a map containing logger names to the levels that they should log at.  This
-is interpreted hierarchically, so in the above example the logger `mymodule.MyClass` will log at
-level `info`, since it matches the `mymodule` configuration.  The logger `mymodule.some.hierarchy`
-will log at level `fatal`, as will any loggers with names that start `mymodule.some.hierarchy.`.
+The second argument is a map containing logger names to the levels that they should log at.  This is interpreted hierarchically, so in the above example the logger `mymodule.MyClass` will log at level `info`, since it matches the `mymodule` configuration.  The logger `mymodule.some.hierarchy` will log at level `fatal`, as will any loggers with names that start `mymodule.some.hierarchy.`.
 
-The third argument is an array of destinations that log events should be routed too.  If you don't
-pass anything (as in the above example), this will default to an array containing only a logger that
-outputs to the console object in environments that support this.
+The third argument is an array of destinations that log events should be routed too.  If you don't pass anything (as in the above example), this will default to an array containing only a logger that outputs to the console object in environments that support this.
 
-Calling `fell.configure` clears the state of the logger, so the levels, configuration and log
-destinations are all reset.
+Calling `fell.configure` clears the state of the logger, so the levels, configuration and log destinations are all reset.
 
 If you want to modify the logging while in use you can use methods specifically for that:
 
@@ -113,8 +98,7 @@ fell.removeDestination(store);
 
 ## Testing
 
-Care must be taken when testing for log messages in order to avoid writing fragile tests. To help with this, we
-recommend the use of a mocking library like [Mochito](https://github.com/dchambers/mochito).
+Care must be taken when testing for log messages in order to avoid writing fragile tests. To help with this, we recommend the use of a mocking library like [Mochito](https://github.com/dchambers/mochito).
 
 Here's an example of some logging code that you might want to test:
 
