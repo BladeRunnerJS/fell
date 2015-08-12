@@ -21,12 +21,13 @@
     "test:browser": "karma start",
     "test:browser:debug": "karma start karma-debug.conf.js",
     "test:saucelabs": "envcheck SAUCE_ACCESS_KEY && karma start karma-saucelabs.conf.js",
-    "coverage": "mocha blanket test -R html-cov > coverage-report.html"
+    "coverage": "mocha blanket test -R html-cov > coverage-report.html && coverage-warning"
   },
   "devDependencies": {
     "blanket": "^1.1.7",
     "browserify": "^11.0.1",
     "core-js": "^1.0.1",
+    "coverage-warning": "^0.0.2",
     "env-check": "^0.0.1",
     "eslint": "^0.24.1",
     "expectations": "^0.5.1",
