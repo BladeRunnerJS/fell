@@ -1,3 +1,4 @@
+/* @flow */
 'use strict';
 
 var Emitter = require('emitr');
@@ -34,7 +35,7 @@ function setLoggerLevels(defaultLevel, config, loggers) {
 	}
 }
 
-Log.prototype.getLogger = function(component) {
+Log.prototype.getLogger = function(component /* : string */) /* : Logger */ {
 	if (arguments.length === 0) { component = DEFAULT_COMPONENT; }
 	if (this.loggers[component] !== undefined) {
 		return this.loggers[component];
