@@ -32,6 +32,14 @@ describe('Log class', function() {
 			mochito.verify(store, mochito.once()).onLog(log.DEFAULT_COMPONENT, 'info', ['logging message at level {0}', '@info']);
 		});
 
+		it('allows matchers to be used on message arguments', function() {
+			// when
+			log.info('logging _short_ message');
+
+			// then
+			mochito.verify(store, mochito.once()).onLog(log.DEFAULT_COMPONENT, 'info', mochito.hasItem(mochito.containsString('_short_')));
+		});
+
 		it('does not output debug level messages.', function() {
 			// when
 			log.Levels.forEach(function(level) {
