@@ -14,6 +14,7 @@
   "main": "./src/fell.js",
   "scripts": {
     "prepublish": "mkdirp dist && browserify src/fell.js -s fell -o dist/fell.js",
+    "postpublish": "gh-release -a dist/fell.js",
     "test": "npm run test:lint && npm run test:node && npm run test:browser && npm run test:saucelabs",
     "test:lint": "eslint src test",
     "test:node": "mocha test",
@@ -31,6 +32,7 @@
     "env-check": "^0.0.1",
     "eslint": "^0.24.1",
     "expectations": "^0.5.1",
+    "gh-release": "^2.0.1",
     "karma": "^0.13.6",
     "karma-browserify": "^4.2.1",
     "karma-chrome-launcher": "^0.2.0",
