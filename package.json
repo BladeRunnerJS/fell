@@ -15,8 +15,9 @@
   "scripts": {
     "prepublish": "mkdirp dist && browserify src/fell.js -s fell -o dist/fell.js",
     "postpublish": "publish-release --assets dist/fell.js --notes 'Add release notes here.'",
-    "test": "npm run test:lint && npm run test:node && npm run test:browser && npm run test:saucelabs",
-    "test:lint": "eslint src test",
+    "pretest": "npm run pretest:lint",
+    "pretest:lint": "eslint src test",
+    "test": "npm run test:node && npm run test:browser && npm run test:saucelabs",
     "test:node": "mocha test",
     "test:node:debug": "mocha test -w",
     "test:browser": "karma start",
