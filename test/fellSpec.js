@@ -21,4 +21,9 @@ describe('fell', function() {
 		fell.info('@my-message');
 		expect(loggedMessage).toContain('@my-message');
 	});
+
+	it('is backwardly compatible with 0.0.x', function() {
+		fell.Log.info('@my-message');
+		expect(loggedMessage).toContain('@my-message');
+	});
 });

@@ -9,5 +9,6 @@ fell.destination = {
 	LogStore: LogStore,
 	ConsoleLog: ConsoleLog
 };
+fell.Log = fell;
 
 module.exports = fell;
